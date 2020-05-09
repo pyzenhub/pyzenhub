@@ -7,7 +7,7 @@
 # -----------------------------------------------------------------------------
 """ZenHub API."""
 
-from .core import ZenHubError, APILimitError, NotFoundError, InvalidTokenError, ZenHub
+from .core import ZenhubError, APILimitError, NotFoundError, InvalidTokenError, Zenhub
 
 
 __version__ = "0.1.0.dev0"

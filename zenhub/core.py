@@ -12,19 +12,19 @@ import datetime
 import requests
 
 
-class ZenHubError(Exception):
+class ZenhubError(Exception):
     pass
 
 
-class InvalidTokenError(ZenHubError):
+class InvalidTokenError(ZenhubError):
     pass
 
 
-class APILimitError(ZenHubError):
+class APILimitError(ZenhubError):
     pass
 
 
-class NotFoundError(ZenHubError):
+class NotFoundError(ZenhubError):
     pass
 
 
@@ -65,7 +65,7 @@ class Zenhub(object):
         elif status_code == 404:
             raise NotFoundError("Not found!")
         else:
-            raise ZenHubError("Unknown error!")
+            raise ZenhubError("Unknown error!")
 
         return contents
 
