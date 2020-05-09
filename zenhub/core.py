@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Copyright (c) The Spyder Development Team
+# Copyright (c) Gonzalo Peña-Castellanos (@goanpeca)
 #
 # Licensed under the terms of the MIT License
 # (See LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 """ZenHub API."""
+
+import datetime
 
 import requests
 
@@ -67,6 +69,14 @@ class ZenHub(object):
 
         return contents
 
+    @staticmethod
+    def _check_date(date):
+        """Check date and transform to valid format."""
+        if isinstance(date, datetime.datetime):
+            date = date.replace(microsecond=0).isoformat() + "Z"
+
+        return date
+
     @classmethod
     def _make_url(cls, url):
         """Create full api url."""
@@ -74,27 +84,27 @@ class ZenHub(object):
 
     def _get(self, url):
         """Send GET request with given url."""
-        response = self._session.get(url)
+        response = self._session.get(url=self._make_url(url))
         return self._parse_response_contents(response)
 
     def _post(self, url, body={}):
         """Send POST request with given url and data."""
-        response = self._session.post(url=url, json=body)
+        response = self._session.post(url=self._make_url(url), json=body)
         return self._parse_response_contents(response)
 
     def _put(self, url, body):
         """Send PUT request with given url and data."""
-        response = self._session.put(url=url, data=body)
+        response = self._session.put(url=self._make_url(url), data=body)
         return self._parse_response_contents(response)
 
     def _delete(self, url, body={}):
         """Send DELETE request with given url and data."""
-        response = self._session.delete(url=url, data=body)
+        response = self._session.delete(url=self._make_url(url), data=body)
         return self._parse_response_contents(response)
 
     def _patch(self, url, body):
         """Send PATCH request with given url and data."""
-        response = self._session.patch(url=url, data=body)
+        response = self._session.patch(url=self._make_url(url), data=body)
         return self._parse_response_contents(response)
 
     # --- Issues
@@ -106,7 +116,7 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#get-issue-data
         """
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}"
-        return self._get(self._make_url(url))
+        return self._get(url)
 
     def get_issue_events(self, repo_id, issue_number):
         """
@@ -115,7 +125,7 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#get-issue-events
         """
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/events"
-        return self._get(self._make_url(url))
+        return self._get(url)
 
     def move_issue(self, workspace_id, repo_id, issue_number, pipeline_id, position):
         """
@@ -128,7 +138,7 @@ class ZenHub(object):
             "pipeline_id": pipeline_id,
             "position": position,
         }
-        return self._post(self._make_url(url), body)
+        return self._post(url, body)
 
     def move_issue_in_oldest_workspace(
         self, repo_id, issue_number, pipeline_id, position
@@ -143,7 +153,7 @@ class ZenHub(object):
             "pipeline_id": pipeline_id,
             "position": position,
         }
-        return self._post(self._make_url(url), body)
+        return self._post(url, body)
 
     def set_issue_estimate(self, repo_id, issue_number, estimate):
         """
@@ -155,7 +165,7 @@ class ZenHub(object):
         body = {
             "estimate": estimate,
         }
-        return self._put(self._make_url(url), body)
+        return self._put(url, body)
 
     # --- Epics
     # ------------------------------------------------------------------------
@@ -166,7 +176,7 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#get-epics-for-a-repository
         """
         url = f"/p1/repositories/{repo_id}/epics"
-        return self._get(self._make_url(url))
+        return self._get(url)
 
     def get_epic_data(self, repo_id, epic_id):
         """
@@ -175,7 +185,7 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#get-epic-data
         """
         url = f"/p1/repositories/{repo_id}/epics/{epic_id}"
-        return self._get(self._make_url(url))
+        return self._get(url)
 
     def convert_epic_to_issue(self, repo_id, issue_number):
         """
@@ -184,7 +194,7 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#convert-an-epic-to-an-issue
         """
         url = f"/p1/repositories/{repo_id}/epics/{issue_number}/convert_to_issue"
-        return self._post(self._make_url(url))
+        return self._post(url)
 
     def convert_issue_to_epic(self, repo_id, issue_number):
         """
@@ -193,7 +203,7 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#convert-issue-to-epic
         """
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/convert_to_epic"
-        return self._post(self._make_url(url))
+        return self._post(url)
 
     def add_or_remove_issues_to_epic(
         self, repo_id, issue_number, remove_issues=None, add_issues=None
@@ -213,7 +223,7 @@ class ZenHub(object):
             "remove_issues": remove_issues or [],
             "add_issues": add_issues or [],
         }
-        return self._post(self._make_url(url), body)
+        return self._post(url, body)
 
     # --- Workspaces
     # ------------------------------------------------------------------------
@@ -224,7 +234,7 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#get-zenhub-workspaces-for-a-repository
         """
         url = f"/p2/repositories/{repo_id}/workspaces"
-        return self._get(self._make_url(url))
+        return self._get(url)
 
     def get_repository_board(self, repo_id, workspace_id):
         """
@@ -233,16 +243,16 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#get-a-zenhub-board-for-a-repository
         """
         url = f"/p2/workspaces/{workspace_id}/repositories/{repo_id}/board"
-        return self._get(self._make_url(url))
+        return self._get(url)
 
-    def oldest_repository_board(self, repo_id):
+    def get_oldest_repository_board(self, repo_id):
         """
         Get the oldest ZenHub board for a repository.
 
         See: https://github.com/ZenHubIO/API#get-the-oldest-zenhub-board-for-a-repository
         """
         url = f"/p1/repositories/{repo_id}/board"
-        return self._get(self._make_url(url))
+        return self._get(url)
 
     # --- Milestones
     # ------------------------------------------------------------------------
@@ -254,9 +264,9 @@ class ZenHub(object):
         """
         url = f"/p1/repositories/{repo_id}/milestones/{milestone_number}/start_date"
         body = {
-            "start_date": start_date,
+            "start_date": self._check_date(start_date),
         }
-        return self._post(self._make_url(url), body)
+        return self._post(url, body)
 
     def get_milestone_start_date(self, repo_id, milestone_number):
         """
@@ -265,7 +275,7 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#get-milestone-start-date
         """
         url = f"/p1/repositories/{repo_id}/milestones/{milestone_number}/start_date"
-        return self._get(self._make_url(url))
+        return self._get(url)
 
     # --- Dependencies
     # ------------------------------------------------------------------------
@@ -276,7 +286,7 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#get-dependencies-for-a-repository
         """
         url = f"/p1/repositories/{repo_id}/dependencies"
-        return self._get(self._make_url(url))
+        return self._get(url)
 
     def create_dependency(
         self,
@@ -301,7 +311,7 @@ class ZenHub(object):
                 "issue_number": blocked_issue_number,
             },
         }
-        return self._post(self._make_url(url), body)
+        return self._post(url, body)
 
     def remove_dependency(
         self,
@@ -326,7 +336,7 @@ class ZenHub(object):
                 "issue_number": blocked_issue_number,
             },
         }
-        return self._delete(self._make_url(url), body)
+        return self._delete(url, body)
 
     # --- Release Reports
     # ------------------------------------------------------------------------
@@ -347,16 +357,16 @@ class ZenHub(object):
         url = f"/p1/repositories/{repo_id}/reports/release"
         body = {
             "title": title,
-            "start_date": start_date,
-            "desired_end_date": desired_end_date,
+            "start_date": self._check_date(start_date),
+            "desired_end_date": self._check_date(desired_end_date),
         }
         if description:
-            body['description'] = repositories
+            body["description"] = repositories
 
         if repositories:
-            body['repositories'] = repositories
+            body["repositories"] = repositories
 
-        return self._post(self._make_url(url), body)
+        return self._post(url, body)
 
     def get_release_report(self, release_id):
         """
@@ -365,7 +375,7 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#get-a-release-report
         """
         url = f"/p1/reports/release/{release_id}"
-        return self._get(self._make_url(url))
+        return self._get(url)
 
     def get_release_reports(self, repo_id):
         """
@@ -374,7 +384,7 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#get-release-reports-for-a-repository
         """
         url = f"/p1/repositories/{repo_id}/reports/releases"
-        return self._get(self._make_url(url))
+        return self._get(url)
 
     def edit_release_report(
         self, release_id, title, description, start_date, desired_end_date, state=None,
@@ -388,13 +398,13 @@ class ZenHub(object):
         body = {
             "title": title,
             "description": description,
-            "start_date": start_date,
-            "desired_end_date": desired_end_date,
+            "start_date": self._check_date(start_date),
+            "desired_end_date": self._check_date(desired_end_date),
         }
         if state is not None and state in ["open", "closed"]:
             body["state"] = state
 
-        return self._patch(self._make_url(url), body)
+        return self._patch(url, body)
 
     def add_repo_to_release_report(self, release_id, repo_id):
         """
@@ -403,7 +413,7 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#add-a-repository-to-a-release-report
         """
         url = f"/p1/reports/release/{release_id}/repository/{repo_id}"
-        return self._post(self._make_url(url))
+        return self._post(url)
 
     def remove_repo_from_release_report(self, release_id, repo_id):
         """
@@ -412,7 +422,7 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#remove-a-repository-from-a-release-report
         """
         url = f"/p1/reports/release/{release_id}/repository/{repo_id}"
-        return self._delete(self._make_url(url))
+        return self._delete(url)
 
     # --- Release Report Issues
     # ------------------------------------------------------------------------
@@ -423,7 +433,7 @@ class ZenHub(object):
         See: https://github.com/ZenHubIO/API#get-all-the-issues-for-a-release-report
         """
         url = f"/p1/reports/release/{release_id}/issues"
-        return self._get(self._make_url(url))
+        return self._get(url)
 
     def add_or_remove_issues_from_release_report(
         self, release_id, add_issues=None, remove_issues=None,
@@ -438,5 +448,4 @@ class ZenHub(object):
             "add_issues": add_issues or [],
             "remove_issues": remove_issues or [],
         }
-        return self._patch(self._make_url(url), body)
- 
+        return self._patch(url, body)
