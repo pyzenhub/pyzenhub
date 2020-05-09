@@ -5,9 +5,9 @@ Python bindings to the Zenhub API
 ## Usage
 
 ```python
-from zenhub import ZenHub
+from zenhub import Zenhub
 
-zh = ZenHub(<zenhub_token>)
+zh = Zenhub(<zenhub_token>)
 zh.get_epics(<repo_id>)
 ```
 

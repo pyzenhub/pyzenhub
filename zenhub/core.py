@@ -28,8 +28,8 @@ class NotFoundError(ZenHubError):
     pass
 
 
-class ZenHub(object):
-    """ZenHub API wrapper."""
+class Zenhub(object):
+    """Zenhub API wrapper."""
 
     _HEADERS = {
         "Content-Type": "application/json",
@@ -236,7 +236,7 @@ class ZenHub(object):
         url = f"/p2/repositories/{repo_id}/workspaces"
         return self._get(url)
 
-    def get_repository_board(self, repo_id, workspace_id):
+    def get_repository_board(self, workspace_id, repo_id):
         """
         Get ZenHub Board data for a repository (repo_id) within the Workspace (workspace_id).
 
