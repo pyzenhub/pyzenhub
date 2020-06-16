@@ -10,7 +10,7 @@
 from .core import ZenhubError, APILimitError, NotFoundError, InvalidTokenError, Zenhub
 
 
-__version__ = "0.1.0.dev0"
+__version__ = "0.1.0"
 
 
 def _to_version_info(version):
