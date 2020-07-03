@@ -6,11 +6,14 @@
 # (See LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 """ZenHub API."""
+from .core import APILimitError
+from .core import InvalidTokenError
+from .core import NotFoundError
+from .core import Zenhub
+from .core import ZenhubError
 
-from .core import ZenhubError, APILimitError, NotFoundError, InvalidTokenError, Zenhub
 
-
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 
 def _to_version_info(version):

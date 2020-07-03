@@ -7,24 +7,24 @@
 # (See LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 """Setup script for pyzenhub."""
-
 import ast
 import os
 
-from setuptools import find_packages, setup
+from setuptools import find_packages
+from setuptools import setup
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 
-def get_version(module='zenhub'):
+def get_version(module="zenhub"):
     """Get version."""
-    with open(os.path.join(HERE, module, '__init__.py'), 'r') as f:
+    with open(os.path.join(HERE, module, "__init__.py"), "r") as f:
         data = f.read()
 
-    lines = data.split('\n')
+    lines = data.split("\n")
     for line in lines:
-        if line.startswith('__version__'):
-            version = ast.literal_eval(line.split('=')[-1].strip())
+        if line.startswith("__version__"):
+            version = ast.literal_eval(line.split("=")[-1].strip())
             break
 
     return version
@@ -32,38 +32,37 @@ def get_version(module='zenhub'):
 
 def get_description():
     """Get long description."""
-    with open(os.path.join(HERE, 'README.md'), 'r') as f:
+    with open(os.path.join(HERE, "README.md"), "r") as f:
         data = f.read()
     return data
 
 
-REQUIREMENTS = [
-    'requests',
-]
+REQUIREMENTS = ["requests"]
 
 setup(
-    name='pyzenhub',
+    name="pyzenhub",
     version=get_version(),
     keywords=["zenhub api"],
-    url='https://github.com/goanpeca/pyzenhub',
-    license='MIT',
-    author='Gonzalo Pena-Castellanos',
-    author_email='goanpeca@gmail.com',
-    maintainer='Gonzalo Pena-Castellanos',
-    maintainer_email='goanpeca@gmail.com',
-    description='Python bindings to the Zenhub API',
+    url="https://github.com/goanpeca/pyzenhub",
+    license="MIT",
+    author="Gonzalo Pena-Castellanos",
+    author_email="goanpeca@gmail.com",
+    maintainer="Gonzalo Pena-Castellanos",
+    maintainer_email="goanpeca@gmail.com",
+    description="Python bindings to the Zenhub API",
     long_description=get_description(),
-    long_description_content_type='text/markdown',
-    packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
+    long_description_content_type="text/markdown",
+    packages=["zenhub", "zenhub.tests"],
+    package_dir={"zenhub": "zenhub"},
     install_requires=REQUIREMENTS,
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
 )

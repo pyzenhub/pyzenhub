@@ -6,10 +6,12 @@
 # (See LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 """ZenHub API."""
-
 import datetime
 
 import requests
+
+
+DEFAULT_BASE_URL = "https://api.zenhub.com"
 
 
 class ZenhubError(Exception):
@@ -35,11 +37,11 @@ class Zenhub(object):
         "Content-Type": "application/json",
         "User-Agent": "ZenHub Python Client",
     }
-    _ENDPOINT = "https://api.zenhub.com"
 
-    def __init__(self, token):
+    def __init__(self, token, base_url=DEFAULT_BASE_URL):
         """ZenHub API wrapper."""
         self._session = requests.Session()
+        self._base_url = base_url
 
         # Setup
         self._session.headers.update(self._HEADERS)
@@ -77,10 +79,9 @@ class Zenhub(object):
 
         return date
 
-    @classmethod
-    def _make_url(cls, url):
+    def _make_url(self, url):
         """Create full api url."""
-        return "{}{}".format(cls._ENDPOINT, url)
+        return "{}{}".format(self._base_url, url)
 
     def _get(self, url):
         """Send GET request with given url."""
@@ -134,10 +135,7 @@ class Zenhub(object):
         See: https://github.com/ZenHubIO/API#move-an-issue-between-pipelines
         """
         url = f"/p2/workspaces/{workspace_id}/repositories/{repo_id}/issues/{issue_number}/move"
-        body = {
-            "pipeline_id": pipeline_id,
-            "position": position,
-        }
+        body = {"pipeline_id": pipeline_id, "position": position}
         return self._post(url, body)
 
     def move_issue_in_oldest_workspace(
@@ -149,10 +147,7 @@ class Zenhub(object):
         See: https://github.com/ZenHubIO/API#move-an-issue-between-pipelines-in-the-oldest-workspace
         """
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/moves"
-        body = {
-            "pipeline_id": pipeline_id,
-            "position": position,
-        }
+        body = {"pipeline_id": pipeline_id, "position": position}
         return self._post(url, body)
 
     def set_issue_estimate(self, repo_id, issue_number, estimate):
@@ -162,9 +157,7 @@ class Zenhub(object):
         See: https://github.com/ZenHubIO/API#set-issue-estimate
         """
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/estimate"
-        body = {
-            "estimate": estimate,
-        }
+        body = {"estimate": estimate}
         return self._put(url, body)
 
     # --- Epics
@@ -219,10 +212,7 @@ class Zenhub(object):
         See: https://github.com/ZenHubIO/API#add-or-remove-issues-to-epic
         """
         url = f"/p1/repositories/{repo_id}/epics/{issue_number}/update_issues"
-        body = {
-            "remove_issues": remove_issues or [],
-            "add_issues": add_issues or [],
-        }
+        body = {"remove_issues": remove_issues or [], "add_issues": add_issues or []}
         return self._post(url, body)
 
     # --- Workspaces
@@ -263,9 +253,7 @@ class Zenhub(object):
         See: https://github.com/ZenHubIO/API#set-milestone-start-date
         """
         url = f"/p1/repositories/{repo_id}/milestones/{milestone_number}/start_date"
-        body = {
-            "start_date": self._check_date(start_date),
-        }
+        body = {"start_date": self._check_date(start_date)}
         return self._post(url, body)
 
     def get_milestone_start_date(self, repo_id, milestone_number):
@@ -387,7 +375,7 @@ class Zenhub(object):
         return self._get(url)
 
     def edit_release_report(
-        self, release_id, title, description, start_date, desired_end_date, state=None,
+        self, release_id, title, description, start_date, desired_end_date, state=None
     ):
         """
         Edit a Release Report.
@@ -436,7 +424,7 @@ class Zenhub(object):
         return self._get(url)
 
     def add_or_remove_issues_from_release_report(
-        self, release_id, add_issues=None, remove_issues=None,
+        self, release_id, add_issues=None, remove_issues=None
     ):
         """
         Add or Remove Issues to or from a Release Report.
@@ -444,8 +432,5 @@ class Zenhub(object):
         See: https://github.com/ZenHubIO/API#add-or-remove-issues-to-or-from-a-release-report
         """
         url = f"/p1/reports/release/{release_id}/issues"
-        body = {
-            "add_issues": add_issues or [],
-            "remove_issues": remove_issues or [],
-        }
+        body = {"add_issues": add_issues or [], "remove_issues": remove_issues or []}
         return self._patch(url, body)
