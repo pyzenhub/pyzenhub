@@ -13,7 +13,7 @@ from .core import Zenhub
 from .core import ZenhubError
 
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 
 def _to_version_info(version):

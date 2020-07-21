@@ -52,8 +52,8 @@ setup(
     description="Python bindings to the Zenhub API",
     long_description=get_description(),
     long_description_content_type="text/markdown",
-    packages=["zenhub", "zenhub.tests"],
-    package_dir={"zenhub": "zenhub"},
+    packages=["zenhub", "zenhub.core"],
+    include_package_data=True,
     install_requires=REQUIREMENTS,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
