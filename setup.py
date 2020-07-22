@@ -52,7 +52,7 @@ setup(
     description="Python bindings to the Zenhub API",
     long_description=get_description(),
     long_description_content_type="text/markdown",
-    packages=["zenhub", "zenhub.core"],
+    packages=["zenhub"],
     include_package_data=True,
     install_requires=REQUIREMENTS,
     classifiers=[
