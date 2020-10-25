@@ -349,7 +349,7 @@ class Zenhub(object):
             "desired_end_date": self._check_date(desired_end_date),
         }
         if description:
-            body["description"] = repositories
+            body["description"] = description
 
         if repositories:
             body["repositories"] = repositories
