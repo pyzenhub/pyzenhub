@@ -134,7 +134,7 @@ class Zenhub(object):
 
         See: https://github.com/ZenHubIO/API#move-an-issue-between-pipelines
         """
-        url = f"/p2/workspaces/{workspace_id}/repositories/{repo_id}/issues/{issue_number}/move"
+        url = f"/p2/workspaces/{workspace_id}/repositories/{repo_id}/issues/{issue_number}/moves"
         body = {"pipeline_id": pipeline_id, "position": position}
         return self._post(url, body)
 
