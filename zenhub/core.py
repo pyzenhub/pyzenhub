@@ -7,6 +7,7 @@
 # -----------------------------------------------------------------------------
 """ZenHub API."""
 import datetime
+from email.mime import base
 
 import requests
 
@@ -38,9 +39,15 @@ class Zenhub(object):
         "User-Agent": "ZenHub Python Client",
     }
 
-    def __init__(self, token, base_url=DEFAULT_BASE_URL):
+    def __init__(self, token, base_url=DEFAULT_BASE_URL, enterprise=2):
         """ZenHub API wrapper."""
         self._session = requests.Session()
+        if enterprise == 3:
+            if base_url.endswith('/'):
+                base_url = base_url + "api"
+            else:
+                base_url = base_url + "/api"
+
         self._base_url = base_url
 
         # Setup
@@ -54,7 +61,7 @@ class Zenhub(object):
         """Parse response and convert to json if possible."""
         contents = {}
         status_code = response.status_code
-        if status_code == 200 or status_code == 204:
+        if status_code in [200, 204]:
             if response.text:
                 try:
                     contents = response.json()
