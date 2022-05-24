@@ -7,7 +7,7 @@
 # -----------------------------------------------------------------------------
 """ZenHub API."""
 import datetime
-from typing import NewType, TypedDict, List, Optional
+from typing import TypedDict, List, Optional
 
 import requests
 

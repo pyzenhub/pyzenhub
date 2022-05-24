@@ -6,8 +6,8 @@
 # (See LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 """ZenHub API."""
-from .core import APILimitError, InvalidTokenError, NotFoundError, Zenhub, ZenhubError
-
+from .core import Zenhub
+from .exceptions import APILimitError, InvalidTokenError, NotFoundError, ZenhubError
 
 __version__ = "0.2.2"
 
