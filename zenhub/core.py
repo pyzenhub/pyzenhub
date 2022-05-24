@@ -7,7 +7,7 @@
 # -----------------------------------------------------------------------------
 """ZenHub API."""
 import datetime
-from typing import TypedDict, List, Optional
+from typing import TypedDict, List, Union
 
 import requests
 
@@ -21,6 +21,14 @@ URLString = str
 class Issue(TypedDict):
     repo_id: int
     issue_number: int
+
+
+class AddRemoveIssueResponse(TypedDict):
+    added: List[Issue]
+    removed: List[Issue]
+
+
+PatchResponse = Union[AddRemoveIssueResponse, None]
 
 # Constants
 # -----------------------------------------------------------------------------
@@ -57,14 +65,14 @@ class Zenhub:
     @staticmethod
     def _parse_response_contents(response):
         """Parse response and convert to json if possible."""
-        contents = {}
+        try:
+            contents = response.json()
+        except Exception as err:
+            contents = {}
+
         status_code = response.status_code
         if status_code in [200, 204]:
-            if response.text:
-                try:
-                    contents = response.json()
-                except Exception as err:
-                    print(err)
+            pass
         elif status_code == 401:
             raise InvalidTokenError("Invalid token!")
         elif status_code == 403:
@@ -72,7 +80,8 @@ class Zenhub:
         elif status_code == 404:
             raise NotFoundError("Not found!")
         else:
-            raise ZenhubError("Unknown error!")
+            message = contents.get("message", "Unknown error!")
+            raise ZenhubError(message)
 
         return contents
 
@@ -88,27 +97,27 @@ class Zenhub:
         """Create full api url."""
         return "{}{}".format(self._base_url, url)
 
-    def _get(self, url: URLString):
+    def _get(self, url: URLString) -> dict:
         """Send GET request with given url."""
         response = self._session.get(url=self._make_url(url))
-        return self._parse_response_contents(response)
+        return self._parse_response_contents(response)  # type: ignore
 
-    def _post(self, url: URLString, body={}):
+    def _post(self, url: URLString, body={}) -> dict:
         """Send POST request with given url and data."""
         response = self._session.post(url=self._make_url(url), json=body)
-        return self._parse_response_contents(response)
+        return self._parse_response_contents(response)  # type: ignore
 
-    def _put(self, url: URLString, body):
+    def _put(self, url: URLString, body) -> dict:
         """Send PUT request with given url and data."""
         response = self._session.put(url=self._make_url(url), json=body)
-        return self._parse_response_contents(response)
+        return self._parse_response_contents(response)  # type: ignore
 
-    def _delete(self, url: URLString, body={}):
+    def _delete(self, url: URLString, body={}) -> dict:
         """Send DELETE request with given url and data."""
         response = self._session.delete(url=self._make_url(url), json=body)
-        return self._parse_response_contents(response)
+        return self._parse_response_contents(response)  # type: ignore
 
-    def _patch(self, url: URLString, body):
+    def _patch(self, url: URLString, body) -> PatchResponse:
         """Send PATCH request with given url and data."""
         response = self._session.patch(url=self._make_url(url), json=body)
         return self._parse_response_contents(response)
@@ -475,9 +484,16 @@ class Zenhub:
 
         return self._patch(url, body)
 
-    def add_repo_to_release_report(self, release_id, repo_id):
+    def add_repo_to_release_report(self, release_id: int, repo_id: int) -> dict:
         """
         Add a Repository to a Release Report.
+
+        Parameters
+        ----------
+        release_id : int
+            The ID of the Release Report.
+        repo_id : int
+            ID of the repository, not its full name.
 
         Note
         ----
@@ -486,9 +502,16 @@ class Zenhub:
         url = f"/p1/reports/release/{release_id}/repository/{repo_id}"
         return self._post(url)
 
-    def remove_repo_from_release_report(self, release_id, repo_id):
+    def remove_repo_from_release_report(self, release_id: str, repo_id: int) -> dict:
         """
         Remove a Repository from a Release Report.
+
+        Parameters
+        ----------
+        release_id : str
+            The unique string identifier of the Release Report.
+        repo_id : int
+            ID of the repository, not its full name.
 
         Note
         ----
@@ -499,41 +522,59 @@ class Zenhub:
 
     # --- Release Report Issues
     # ------------------------------------------------------------------------
-    def get_release_report_issues(self, release_id):
+    def get_release_report_issues(self, release_id: str) -> List[Issue]:
         """
         Get all the Issues for a Release Report.
+
+        Parameters
+        ----------
+        release_id : str
+            The unique string identifier of the Release Report.
+
+        Returns
+        -------
+        List of Issue objects.
 
         Note
         ----
         https://github.com/ZenHubIO/API#get-all-the-issues-for-a-release-report
         """
+        # GET /p1/reports/release/:release_id/issues
         url = f"/p1/reports/release/{release_id}/issues"
-        return self._get(url)
+        return self._get(url)  # type: ignore
 
     def add_or_remove_issues_from_release_report(
         self,
-        release_id: int,
-        add_issues: Optional[List[Issue]] = None,
-        remove_issues: Optional[List[Issue]] = None,
-    ):
+        release_id: str,
+        add_issues: List[Issue] = [],
+        remove_issues: List[Issue] = [],
+    ) -> AddRemoveIssueResponse:
         """
         Add or Remove Issues to or from a Release Report.
 
+        Adding and removing issues can be done in the same request by
+        providing both ``add_issues`` and ``remove_issues`` parameters.
+
         Parameters
         ----------
-        release_id : int
-            The ID of the Release Report.
-        add_issues :
+        release_id : str
+            The unique string identifier of the Release Report.
+        add_issues : List of Issue
             A list of dictionaries with ``repo_id`` and ``issue_number`` to
             add to the Release Report.
-        remove_issues :
+        remove_issues : List of Issue
             A list of dictionaries with ``repo_id`` and ``issue_number`` to
             remove from the Release Report.
+
+        Returns
+        -------
+        AddRemoveIssueResponse
 
         Note
         ----
         https://github.com/ZenHubIO/API#add-or-remove-issues-to-or-from-a-release-report
         """
+        # PATCH /p1/reports/release/:release_id/issues
         url = f"/p1/reports/release/{release_id}/issues"
-        body = {"add_issues": add_issues or [], "remove_issues": remove_issues or []}
-        return self._patch(url, body)
+        body = {"add_issues": add_issues, "remove_issues": remove_issues}
+        return self._patch(url, body)  # type: ignore

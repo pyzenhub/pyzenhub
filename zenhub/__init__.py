@@ -6,20 +6,20 @@
 # (See LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 """ZenHub API."""
+
+from typing import List, Union
 from .core import Zenhub
 from .exceptions import APILimitError, InvalidTokenError, NotFoundError, ZenhubError
 
 __version__ = "0.2.2"
 
 
-def _to_version_info(version):
+def _to_version_info(version: str) -> tuple:
     """Convert a version string to a number and string tuple."""
-    parts = []
+    parts: List[Union[str, int]] = []
     for part in version.split("."):
-        try:
-            part = int(part)
-        except ValueError:
-            pass
+        if part.isnumeric():
+            part = int(part)  # type: ignore
 
         parts.append(part)
 
