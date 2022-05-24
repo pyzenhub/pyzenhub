@@ -9,7 +9,7 @@
 from .core import APILimitError, InvalidTokenError, NotFoundError, Zenhub, ZenhubError
 
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 
 def _to_version_info(version):

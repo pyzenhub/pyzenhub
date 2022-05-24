@@ -7,14 +7,26 @@
 # -----------------------------------------------------------------------------
 """ZenHub API."""
 import datetime
+from typing import NewType, TypedDict, List, Optional
 
 import requests
 
-
+# Constants
+# -----------------------------------------------------------------------------
 DEFAULT_BASE_URL = "https://api.zenhub.com"
-URLString = str
+
+# Types
+# -----------------------------------------------------------------------------
+URLString = NewType('URLString', str)
 
 
+class Issue(TypedDict):
+    repo_id : int
+    issue_number : int
+
+
+# Exceptions
+# -----------------------------------------------------------------------------
 class ZenhubError(Exception):
     pass
 
@@ -88,38 +100,38 @@ class Zenhub:
 
         return date
 
-    def _make_url(self, url):
+    def _make_url(self, url : URLString):
         """Create full api url."""
         return "{}{}".format(self._base_url, url)
 
-    def _get(self, url):
+    def _get(self, url : URLString):
         """Send GET request with given url."""
         response = self._session.get(url=self._make_url(url))
         return self._parse_response_contents(response)
 
-    def _post(self, url, body={}):
+    def _post(self, url : URLString, body={}):
         """Send POST request with given url and data."""
         response = self._session.post(url=self._make_url(url), json=body)
         return self._parse_response_contents(response)
 
-    def _put(self, url, body):
+    def _put(self, url : URLString, body):
         """Send PUT request with given url and data."""
         response = self._session.put(url=self._make_url(url), json=body)
         return self._parse_response_contents(response)
 
-    def _delete(self, url, body={}):
+    def _delete(self, url : URLString, body={}):
         """Send DELETE request with given url and data."""
         response = self._session.delete(url=self._make_url(url), json=body)
         return self._parse_response_contents(response)
 
-    def _patch(self, url, body):
+    def _patch(self, url : URLString, body):
         """Send PATCH request with given url and data."""
         response = self._session.patch(url=self._make_url(url), json=body)
         return self._parse_response_contents(response)
 
     # --- Issues
     # ------------------------------------------------------------------------
-    def get_issue_data(self, repo_id: int, issue_number: int) -> dict:
+    def get_issue_data(self, repo_id : int, issue_number : int) -> dict:
         """
         Get the data for a specific issue.
 
@@ -515,7 +527,7 @@ class Zenhub:
         return self._get(url)
 
     def add_or_remove_issues_from_release_report(
-        self, release_id, add_issues=None, remove_issues=None
+        self, release_id : int, add_issues : Optional[List[Issue]] = None, remove_issues: Optional[List[Issue]]=None
     ):
         """
         Add or Remove Issues to or from a Release Report.
@@ -525,10 +537,14 @@ class Zenhub:
         release_id : int
             The ID of the Release Report.
         add_issues :
-            A list of Issue IDs to add to the Release Report.
+            A list of dictionaries with ``repo_id`` and ``issue_number`` to
+            add to the Release Report.
         remove_issues :
-            A list of Issue IDs to remove from the Release Report.
+            A list of dictionaries with ``repo_id`` and ``issue_number`` to
+            remove from the Release Report.
 
+add_issues		Required, array of Objects with repo_id and issue_number
+remove_issues	[{repo_id: Number, issue_number: Number}]	Required, array of Objects with repo_id and issue_number
         Note
         ----
         https://github.com/ZenHubIO/API#add-or-remove-issues-to-or-from-a-release-report
