@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Copyright (c) Gonzalo Peña-Castellanos (@goanpeca)
+# Copyright (c) 2022 Gonzalo Peña-Castellanos (@goanpeca)
 #
 # Licensed under the terms of the MIT License
 # (See LICENSE.txt for details)
 # -----------------------------------------------------------------------------
 """ZenHub API."""
 import datetime
-from email.mime import base
 
 import requests
 
 
 DEFAULT_BASE_URL = "https://api.zenhub.com"
+URLString = str
 
 
 class ZenhubError(Exception):
@@ -31,7 +31,7 @@ class NotFoundError(ZenhubError):
     pass
 
 
-class Zenhub(object):
+class Zenhub:
     """Zenhub API wrapper."""
 
     _HEADERS = {
@@ -39,11 +39,13 @@ class Zenhub(object):
         "User-Agent": "ZenHub Python Client",
     }
 
-    def __init__(self, token, base_url=DEFAULT_BASE_URL, enterprise=2):
+    def __init__(
+        self, token: str, base_url: URLString = DEFAULT_BASE_URL, enterprise: int = 2
+    ):
         """ZenHub API wrapper."""
         self._session = requests.Session()
-        if enterprise == 3:
-            if base_url.endswith('/'):
+        if enterprise == 3 and base_url != DEFAULT_BASE_URL:
+            if base_url.endswith("/"):
                 base_url = base_url + "api"
             else:
                 base_url = base_url + "/api"
@@ -117,20 +119,44 @@ class Zenhub(object):
 
     # --- Issues
     # ------------------------------------------------------------------------
-    def get_issue_data(self, repo_id, issue_number):
+    def get_issue_data(self, repo_id: int, issue_number: int) -> dict:
         """
         Get the data for a specific issue.
+
+        Parameters
+        ----------
+        repo_id : int
+            ID of the repository, not its full name.
+        issue_number : int
+            Reposirtory issue number.
+
+        Returns
+        -------
+        dict
 
         See: https://github.com/ZenHubIO/API#get-issue-data
         """
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}"
         return self._get(url)
 
-    def get_issue_events(self, repo_id, issue_number):
+    def get_issue_events(self, repo_id: int, issue_number: int) -> dict:
         """
         Get the events for an issue.
 
-        See: https://github.com/ZenHubIO/API#get-issue-events
+        Parameters
+        ----------
+        repo_id : int
+            ID of the repository, not its full name.
+        issue_number : int
+            Reposirtory issue number.
+
+        Returns
+        -------
+        dict
+
+        Note
+        ----
+        https://github.com/ZenHubIO/API#get-issue-events
         """
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/events"
         return self._get(url)
@@ -139,7 +165,21 @@ class Zenhub(object):
         """
         Moves an issue between Pipelines in a Workspace.
 
-        See: https://github.com/ZenHubIO/API#move-an-issue-between-pipelines
+        Parameters
+        ----------
+        workspace_id : int
+            ID of the workspace.
+        repo_id : int
+            ID of the repository, not its full name.
+        issue_number : int
+            Reposirtory issue number.
+        pipeline_id : int
+            ID of the pipeline, not its full name.
+        position FIXME:
+
+        Note
+        ----
+        https://github.com/ZenHubIO/API#move-an-issue-between-pipelines
         """
         url = f"/p2/workspaces/{workspace_id}/repositories/{repo_id}/issues/{issue_number}/moves"
         body = {"pipeline_id": pipeline_id, "position": position}
@@ -151,7 +191,9 @@ class Zenhub(object):
         """
         Moves an issue between Pipelines in a Workspace.
 
-        See: https://github.com/ZenHubIO/API#move-an-issue-between-pipelines-in-the-oldest-workspace
+        Note
+        ----
+        https://github.com/ZenHubIO/API#move-an-issue-between-pipelines-in-the-oldest-workspace
         """
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/moves"
         body = {"pipeline_id": pipeline_id, "position": position}
@@ -161,7 +203,9 @@ class Zenhub(object):
         """
         Set Issue Estimate.
 
-        See: https://github.com/ZenHubIO/API#set-issue-estimate
+        Note
+        ----
+        https://github.com/ZenHubIO/API#set-issue-estimate
         """
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/estimate"
         body = {"estimate": estimate}
@@ -173,7 +217,9 @@ class Zenhub(object):
         """
         Get all Epics for a repository.
 
-        See: https://github.com/ZenHubIO/API#get-epics-for-a-repository
+        Note
+        ----
+        https://github.com/ZenHubIO/API#get-epics-for-a-repository
         """
         url = f"/p1/repositories/{repo_id}/epics"
         return self._get(url)
@@ -182,7 +228,9 @@ class Zenhub(object):
         """
         Get all Epics for a repository.
 
-        See: https://github.com/ZenHubIO/API#get-epic-data
+        Note
+        ----
+        https://github.com/ZenHubIO/API#get-epic-data
         """
         url = f"/p1/repositories/{repo_id}/epics/{epic_id}"
         return self._get(url)
@@ -191,7 +239,9 @@ class Zenhub(object):
         """
         Converts an Epic back to a regular issue.
 
-        See: https://github.com/ZenHubIO/API#convert-an-epic-to-an-issue
+        Note
+        ----
+        https://github.com/ZenHubIO/API#convert-an-epic-to-an-issue
         """
         url = f"/p1/repositories/{repo_id}/epics/{issue_number}/convert_to_issue"
         return self._post(url)
@@ -200,7 +250,9 @@ class Zenhub(object):
         """
         Converts an issue to an Epic, along with any issues that should be part of it.
 
-        See: https://github.com/ZenHubIO/API#convert-issue-to-epic
+        Note
+        ----
+        https://github.com/ZenHubIO/API#convert-issue-to-epic
         """
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/convert_to_epic"
         return self._post(url)
@@ -216,7 +268,9 @@ class Zenhub(object):
         remove_issues	[{repo_id: Number, issue_number: Number}]
         add_issues	[{repo_id: Number, issue_number: Number}]
 
-        See: https://github.com/ZenHubIO/API#add-or-remove-issues-to-epic
+        Note
+        ----
+        https://github.com/ZenHubIO/API#add-or-remove-issues-to-epic
         """
         url = f"/p1/repositories/{repo_id}/epics/{issue_number}/update_issues"
         body = {"remove_issues": remove_issues or [], "add_issues": add_issues or []}
@@ -228,7 +282,9 @@ class Zenhub(object):
         """
         Gets all Workspaces containing repo_id.
 
-        See: https://github.com/ZenHubIO/API#get-zenhub-workspaces-for-a-repository
+        Note
+        ----
+        https://github.com/ZenHubIO/API#get-zenhub-workspaces-for-a-repository
         """
         url = f"/p2/repositories/{repo_id}/workspaces"
         return self._get(url)
@@ -237,7 +293,9 @@ class Zenhub(object):
         """
         Get ZenHub Board data for a repository (repo_id) within the Workspace (workspace_id).
 
-        See: https://github.com/ZenHubIO/API#get-a-zenhub-board-for-a-repository
+        Note
+        ----
+        https://github.com/ZenHubIO/API#get-a-zenhub-board-for-a-repository
         """
         url = f"/p2/workspaces/{workspace_id}/repositories/{repo_id}/board"
         return self._get(url)
@@ -246,7 +304,9 @@ class Zenhub(object):
         """
         Get the oldest ZenHub board for a repository.
 
-        See: https://github.com/ZenHubIO/API#get-the-oldest-zenhub-board-for-a-repository
+        Note
+        ----
+        https://github.com/ZenHubIO/API#get-the-oldest-zenhub-board-for-a-repository
         """
         url = f"/p1/repositories/{repo_id}/board"
         return self._get(url)
@@ -257,7 +317,9 @@ class Zenhub(object):
         """
         Set milestone start date.
 
-        See: https://github.com/ZenHubIO/API#set-milestone-start-date
+        Note
+        ----
+        https://github.com/ZenHubIO/API#set-milestone-start-date
         """
         url = f"/p1/repositories/{repo_id}/milestones/{milestone_number}/start_date"
         body = {"start_date": self._check_date(start_date)}
@@ -267,7 +329,9 @@ class Zenhub(object):
         """
         Get milestone start date.
 
-        See: https://github.com/ZenHubIO/API#get-milestone-start-date
+        Note
+        ----
+        https://github.com/ZenHubIO/API#get-milestone-start-date
         """
         url = f"/p1/repositories/{repo_id}/milestones/{milestone_number}/start_date"
         return self._get(url)
@@ -278,7 +342,9 @@ class Zenhub(object):
         """
         Get Dependencies for a Repository.
 
-        See: https://github.com/ZenHubIO/API#get-dependencies-for-a-repository
+        Note
+        ----
+        https://github.com/ZenHubIO/API#get-dependencies-for-a-repository
         """
         url = f"/p1/repositories/{repo_id}/dependencies"
         return self._get(url)
@@ -293,7 +359,9 @@ class Zenhub(object):
         """
         Create a dependency.
 
-        See: https://github.com/ZenHubIO/API#create-a-dependency
+        Note
+        ----
+        https://github.com/ZenHubIO/API#create-a-dependency
         """
         url = "/p1/dependencies"
         body = {
@@ -318,7 +386,9 @@ class Zenhub(object):
         """
         Remove a dependency.
 
-        See: https://github.com/ZenHubIO/API#remove-a-dependency
+        Note
+        ----
+        https://github.com/ZenHubIO/API#remove-a-dependency
         """
         url = "/p1/dependencies"
         body = {
@@ -347,7 +417,9 @@ class Zenhub(object):
         """
         Create a Release Report.
 
-        See: https://github.com/ZenHubIO/API#create-a-release-report
+        Note
+        ----
+        https://github.com/ZenHubIO/API#create-a-release-report
         """
         url = f"/p1/repositories/{repo_id}/reports/release"
         body = {
@@ -367,7 +439,9 @@ class Zenhub(object):
         """
         Get a Release Report.
 
-        See: https://github.com/ZenHubIO/API#get-a-release-report
+        Note
+        ----
+        https://github.com/ZenHubIO/API#get-a-release-report
         """
         url = f"/p1/reports/release/{release_id}"
         return self._get(url)
@@ -376,7 +450,9 @@ class Zenhub(object):
         """
         Get Release Reports for a Repository.
 
-        See: https://github.com/ZenHubIO/API#get-release-reports-for-a-repository
+        Note
+        ----
+        https://github.com/ZenHubIO/API#get-release-reports-for-a-repository
         """
         url = f"/p1/repositories/{repo_id}/reports/releases"
         return self._get(url)
@@ -387,7 +463,9 @@ class Zenhub(object):
         """
         Edit a Release Report.
 
-        See: https://github.com/ZenHubIO/API#edit-a-release-report
+        Note
+        ----
+        https://github.com/ZenHubIO/API#edit-a-release-report
         """
         url = f"/p1/reports/release/{release_id}"
         body = {
@@ -405,7 +483,9 @@ class Zenhub(object):
         """
         Add a Repository to a Release Report.
 
-        See: https://github.com/ZenHubIO/API#add-a-repository-to-a-release-report
+        Note
+        ----
+        https://github.com/ZenHubIO/API#add-a-repository-to-a-release-report
         """
         url = f"/p1/reports/release/{release_id}/repository/{repo_id}"
         return self._post(url)
@@ -414,7 +494,9 @@ class Zenhub(object):
         """
         Remove a Repository from a Release Report.
 
-        See: https://github.com/ZenHubIO/API#remove-a-repository-from-a-release-report
+        Note
+        ----
+        https://github.com/ZenHubIO/API#remove-a-repository-from-a-release-report
         """
         url = f"/p1/reports/release/{release_id}/repository/{repo_id}"
         return self._delete(url)
@@ -425,7 +507,9 @@ class Zenhub(object):
         """
         Get all the Issues for a Release Report.
 
-        See: https://github.com/ZenHubIO/API#get-all-the-issues-for-a-release-report
+        Note
+        ----
+        https://github.com/ZenHubIO/API#get-all-the-issues-for-a-release-report
         """
         url = f"/p1/reports/release/{release_id}/issues"
         return self._get(url)
@@ -436,7 +520,18 @@ class Zenhub(object):
         """
         Add or Remove Issues to or from a Release Report.
 
-        See: https://github.com/ZenHubIO/API#add-or-remove-issues-to-or-from-a-release-report
+        Parameters
+        ----------
+        release_id : int
+            The ID of the Release Report.
+        add_issues :
+            A list of Issue IDs to add to the Release Report.
+        remove_issues :
+            A list of Issue IDs to remove from the Release Report.
+
+        Note
+        ----
+        https://github.com/ZenHubIO/API#add-or-remove-issues-to-or-from-a-release-report
         """
         url = f"/p1/reports/release/{release_id}/issues"
         body = {"add_issues": add_issues or [], "remove_issues": remove_issues or []}
