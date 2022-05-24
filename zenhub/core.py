@@ -95,17 +95,17 @@ class Zenhub(object):
 
     def _put(self, url, body):
         """Send PUT request with given url and data."""
-        response = self._session.put(url=self._make_url(url), data=body)
+        response = self._session.put(url=self._make_url(url), json=body)
         return self._parse_response_contents(response)
 
     def _delete(self, url, body={}):
         """Send DELETE request with given url and data."""
-        response = self._session.delete(url=self._make_url(url), data=body)
+        response = self._session.delete(url=self._make_url(url), json=body)
         return self._parse_response_contents(response)
 
     def _patch(self, url, body):
         """Send PATCH request with given url and data."""
-        response = self._session.patch(url=self._make_url(url), data=body)
+        response = self._session.patch(url=self._make_url(url), json=body)
         return self._parse_response_contents(response)
 
     # --- Issues
