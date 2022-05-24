@@ -54,7 +54,7 @@ class Zenhub(object):
         """Parse response and convert to json if possible."""
         contents = {}
         status_code = response.status_code
-        if status_code == 200:
+        if status_code == 200 or status_code == 204:
             if response.text:
                 try:
                     contents = response.json()
