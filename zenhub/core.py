@@ -11,6 +11,8 @@ from typing import NewType, TypedDict, List, Optional
 
 import requests
 
+from .exceptions import InvalidTokenError, APILimitError, NotFoundError, ZenhubError
+
 # Types
 # -----------------------------------------------------------------------------
 URLString = str
@@ -23,24 +25,6 @@ class Issue(TypedDict):
 # Constants
 # -----------------------------------------------------------------------------
 DEFAULT_BASE_URL: URLString = "https://api.zenhub.com"
-
-
-# Exceptions
-# -----------------------------------------------------------------------------
-class ZenhubError(Exception):
-    pass
-
-
-class InvalidTokenError(ZenhubError):
-    pass
-
-
-class APILimitError(ZenhubError):
-    pass
-
-
-class NotFoundError(ZenhubError):
-    pass
 
 
 class Zenhub:
