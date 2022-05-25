@@ -35,7 +35,7 @@ def get_description():
     return data
 
 
-REQUIREMENTS = ["requests", "typing_extensions"]
+REQUIREMENTS = ["requests", "typing_extensions", "types-requests"]
 
 setup(
     name="pyzenhub",
