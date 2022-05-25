@@ -80,6 +80,7 @@ def test_create_release_report_invalid_dates(zh):
             repositories=[],
         )
 
+
 def test_get_release_report(zh):
     data = zh.get_release_report(RELEASE_REPORT)
     assert list(data.keys()) == RELEASE_REPORT_KEYS
@@ -139,12 +140,15 @@ def test_add_repo_to_release_report(zh):
 
 
 def test_remove_repo_from_release_report(zh):
-    with pytest.raises(ZenhubError) as excinfo:        
+    with pytest.raises(ZenhubError) as excinfo:
         zh.remove_repo_from_release_report(
             RELEASE_REPORT,
             REPO_ID,
         )
-    assert "Validation failed: Release must have at least one repository" in excinfo.value.args[0]
+    assert (
+        "Validation failed: Release must have at least one repository"
+        in excinfo.value.args[0]
+    )
 
 
 # --- Release Report Issues

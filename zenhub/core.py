@@ -107,7 +107,9 @@ class Zenhub:
         return date.replace(microsecond=0).isoformat() + "Z"
 
     @staticmethod
-    def _check_dates(start_date : datetime.datetime, desired_end_date: datetime.datetime) -> None:
+    def _check_dates(
+        start_date: datetime.datetime, desired_end_date: datetime.datetime
+    ) -> None:
         """Check ``desired_end_date`` comes after ``start_date``."""
         if start_date > desired_end_date:
             raise ValueError("Start date must be before end date.")
@@ -121,22 +123,22 @@ class Zenhub:
         response = self._session.get(url=self._make_url(url))
         return self._parse_response_contents(response)
 
-    def _post(self, url: URLString, body:dict={}) -> dict:
+    def _post(self, url: URLString, body: dict = {}) -> dict:
         """Send POST request with given url and data."""
         response = self._session.post(url=self._make_url(url), json=body)
         return self._parse_response_contents(response)
 
-    def _put(self, url: URLString, body:dict) -> dict:
+    def _put(self, url: URLString, body: dict) -> dict:
         """Send PUT request with given url and data."""
         response = self._session.put(url=self._make_url(url), json=body)
         return self._parse_response_contents(response)
 
-    def _delete(self, url: URLString, body:dict={}) -> dict:
+    def _delete(self, url: URLString, body: dict = {}) -> dict:
         """Send DELETE request with given url and data."""
         response = self._session.delete(url=self._make_url(url), json=body)
         return self._parse_response_contents(response)
 
-    def _patch(self, url: URLString, body:dict) -> PatchResponse:
+    def _patch(self, url: URLString, body: dict) -> PatchResponse:
         """Send PATCH request with given url and data."""
         response = self._session.patch(url=self._make_url(url), json=body)
         return self._parse_response_contents(response)  # type: ignore
