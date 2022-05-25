@@ -1,0 +1,62 @@
+name: PR Test
+
+on:
+  pull_request:
+    branches:
+      - main
+  pull_request_target:
+    branches:
+      - main
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install napari
+        run: pip install -e .
+      - name: Install dependencies
+        run: pip install pre-commit
+      - name: Run pre-commit
+        env:
+          ZENHUB_TEST_TOKEN:  ${{ secrets.ZENHUB_TEST_TOKEN }}
+        run: pre-commit run -a
+
+  check-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install napari
+        run: pip install -e .
+      - name: Install dependencies
+        run: pip install check-manifest
+      - name: Run check
+        run: check-manifest
+
+  test:
+    name: ${{ matrix.python }}
+    runs-on: ubuntu-latest
+    needs: pre-commit
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.8", "3.9", "3.10"]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install napari
+        run: pip install -e .
+      - name: Install dependencies
+        run: pip install pytest pytest-cov
+      - name: Run pytest
+        env:
+          ZENHUB_TEST_TOKEN:  ${{ secrets.ZENHUB_TEST_TOKEN }}
+        run: pytest zenhub --cov=zenhub

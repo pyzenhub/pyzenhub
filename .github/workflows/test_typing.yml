@@ -1,0 +1,21 @@
+name: Test typing
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  typing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install napari
+        run: |
+          pip install mypy types-PyYAML types-setuptools
+          pip install -e .
+      - name: Run mypy on typed modules
+        run: mypy zenhub
