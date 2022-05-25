@@ -1,6 +1,9 @@
-from .data import RELEASE_REPORT, REPO_ID
-from zenhub import ZenhubError
 import pytest
+
+from zenhub import ZenhubError
+
+from .data import RELEASE_REPORT, REPO_ID
+
 
 def test_get_release_report_issues(zh):
     data = zh.get_release_report_issues(RELEASE_REPORT)

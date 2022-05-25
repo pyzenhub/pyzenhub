@@ -1,12 +1,14 @@
 """ZenHub release reports methods."""
 import datetime
-
 from typing import Iterable, List, Optional
-from ..types import Base64String, ReportState
-from ..models import AddRemoveIssue, Issue, ReleaseReport
-from ..utils import check_dates, date_to_string
 
-class ReleaseReportsMixin:
+from ..models import AddRemoveIssue, Issue, ReleaseReport
+from ..types import Base64String, ReportState
+from ..utils import check_dates, date_to_string
+from .base import BaseMixin
+
+
+class ReleaseReportsMixin(BaseMixin):
     def create_release_report(
         self,
         repo_id: int,

@@ -1,8 +1,11 @@
-from .data import REPO_ID, RUN_CREATE_TESTS, RELEASE_REPORT
-from zenhub import ZenhubError
-import pytest
-import random
 import datetime
+import random
+
+import pytest
+
+from zenhub import ZenhubError
+
+from .data import RELEASE_REPORT, REPO_ID, RUN_CREATE_TESTS
 
 RELEASE_REPORT_KEYS = [
     "release_id",
@@ -15,6 +18,7 @@ RELEASE_REPORT_KEYS = [
     "state",
     "repositories",
 ]
+
 
 @pytest.mark.skipif(
     RUN_CREATE_TESTS, reason="Create tests are disabled by default."

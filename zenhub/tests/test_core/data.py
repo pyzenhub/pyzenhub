@@ -1,11 +1,5 @@
 """Test ZenHub issues API."""
-import datetime
 import os
-import random
-
-import pytest
-
-from zenhub import Zenhub, ZenhubError
 
 # Constants
 # ----------------------------------------------------------------------------

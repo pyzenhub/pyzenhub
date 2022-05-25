@@ -1,11 +1,13 @@
 """ZenHub release report issues methods."""
 
-from typing import List, Iterable
-from ..types import Base64String
+from typing import Iterable, List
+
 from ..models import AddRemoveIssue, Issue
+from ..types import Base64String
+from .base import BaseMixin
 
 
-class ReleaseReportIssuesMixin:
+class ReleaseReportIssuesMixin(BaseMixin):
     def get_release_report_issues(
         self, release_id: Base64String
     ) -> List[dict]:

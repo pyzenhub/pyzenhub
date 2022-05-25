@@ -5,6 +5,7 @@ from zenhub import Zenhub
 
 from .data import TOKEN
 
+
 # Fixtures
 # ----------------------------------------------------------------------------
 @pytest.fixture
