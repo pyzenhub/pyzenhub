@@ -7,15 +7,19 @@
 # -----------------------------------------------------------------------------
 """ZenHub API."""
 import datetime
-from typing import TypedDict, List, Union
+from typing import List, Union, Optional, Literal, Iterable
 
 import requests
+from typing_extensions import NotRequired, TypedDict
 
 from .exceptions import InvalidTokenError, APILimitError, NotFoundError, ZenhubError
 
 # Types
 # -----------------------------------------------------------------------------
 URLString = str
+Base64String = str
+ISO8601DateString = str
+ReportState = Literal["open", "closed"]
 
 
 class Issue(TypedDict):
@@ -26,6 +30,18 @@ class Issue(TypedDict):
 class AddRemoveIssueResponse(TypedDict):
     added: List[Issue]
     removed: List[Issue]
+
+
+class ReleaseReport(TypedDict):
+    release_id: Base64String
+    title: str
+    description: str
+    start_date: ISO8601DateString
+    desired_end_date: ISO8601DateString
+    created_at: ISO8601DateString
+    closed_at: Optional[ISO8601DateString]
+    state: str
+    repositories: List[int]
 
 
 PatchResponse = Union[AddRemoveIssueResponse, None]
@@ -63,14 +79,14 @@ class Zenhub:
     # --- Helpers
     # ------------------------------------------------------------------------
     @staticmethod
-    def _parse_response_contents(response):
+    def _parse_response_contents(response: requests.Response) -> dict:
         """Parse response and convert to json if possible."""
+        status_code = response.status_code
         try:
             contents = response.json()
-        except Exception as err:
+        except Exception:
             contents = {}
 
-        status_code = response.status_code
         if status_code in [200, 204]:
             pass
         elif status_code == 401:
@@ -86,41 +102,44 @@ class Zenhub:
         return contents
 
     @staticmethod
-    def _check_date(date):
+    def _check_date(date: datetime.datetime) -> ISO8601DateString:
         """Check date and transform to valid format."""
-        if isinstance(date, datetime.datetime):
-            date = date.replace(microsecond=0).isoformat() + "Z"
+        return date.replace(microsecond=0).isoformat() + "Z"
 
-        return date
+    @staticmethod
+    def _check_dates(start_date : datetime.datetime, desired_end_date: datetime.datetime) -> None:
+        """Check ``desired_end_date`` comes after ``start_date``."""
+        if start_date > desired_end_date:
+            raise ValueError("Start date must be before end date.")
 
-    def _make_url(self, url: URLString):
+    def _make_url(self, url: URLString) -> URLString:
         """Create full api url."""
         return "{}{}".format(self._base_url, url)
 
     def _get(self, url: URLString) -> dict:
         """Send GET request with given url."""
         response = self._session.get(url=self._make_url(url))
-        return self._parse_response_contents(response)  # type: ignore
+        return self._parse_response_contents(response)
 
-    def _post(self, url: URLString, body={}) -> dict:
+    def _post(self, url: URLString, body:dict={}) -> dict:
         """Send POST request with given url and data."""
         response = self._session.post(url=self._make_url(url), json=body)
-        return self._parse_response_contents(response)  # type: ignore
+        return self._parse_response_contents(response)
 
-    def _put(self, url: URLString, body) -> dict:
+    def _put(self, url: URLString, body:dict) -> dict:
         """Send PUT request with given url and data."""
         response = self._session.put(url=self._make_url(url), json=body)
-        return self._parse_response_contents(response)  # type: ignore
+        return self._parse_response_contents(response)
 
-    def _delete(self, url: URLString, body={}) -> dict:
+    def _delete(self, url: URLString, body:dict={}) -> dict:
         """Send DELETE request with given url and data."""
         response = self._session.delete(url=self._make_url(url), json=body)
-        return self._parse_response_contents(response)  # type: ignore
+        return self._parse_response_contents(response)
 
-    def _patch(self, url: URLString, body) -> PatchResponse:
+    def _patch(self, url: URLString, body:dict) -> PatchResponse:
         """Send PATCH request with given url and data."""
         response = self._session.patch(url=self._make_url(url), json=body)
-        return self._parse_response_contents(response)
+        return self._parse_response_contents(response)  # type: ignore
 
     # --- Issues
     # ------------------------------------------------------------------------
@@ -412,20 +431,43 @@ class Zenhub:
     # ------------------------------------------------------------------------
     def create_release_report(
         self,
-        repo_id,
-        title,
-        start_date,
-        desired_end_date,
-        description=None,
-        repositories=None,
-    ):
+        repo_id: int,
+        title: str,
+        start_date: datetime.datetime,
+        desired_end_date: datetime.datetime,
+        description: str = "",
+        repositories: Iterable[int] = (),
+    ) -> ReleaseReport:
         """
         Create a Release Report.
+
+        Parameters
+        ----------
+        repo_id : int
+            ID of the repository, not its full name.
+        title : str
+            Title of the Release Report.
+        start_date : datetime.datetime
+            Start date of the Release Report.
+        desired_end_date : datetime.datetime
+            End date of the Release Report.
+        description : str, optional
+            Start date of the Release Report. The default is ''.
+        repositories : Iterable of int, optional
+            List of repository IDs to include in the Release Report.
+            The default is ().
+
+        Returns
+        -------
+        ReleaseReport
+            The created Release Report.
 
         Note
         ----
         https://github.com/ZenHubIO/API#create-a-release-report
         """
+        self._check_dates(start_date, desired_end_date)
+        # POST /p1/repositories/:repo_id/reports/release
         url = f"/p1/repositories/{repo_id}/reports/release"
         body = {
             "title": title,
@@ -436,42 +478,90 @@ class Zenhub:
             body["description"] = description
 
         if repositories:
-            body["repositories"] = repositories
+            body["repositories"] = list(repositories)  # type: ignore
 
-        return self._post(url, body)
+        return self._post(url, body)  # type: ignore
 
-    def get_release_report(self, release_id):
+    def get_release_report(self, release_id: Base64String) -> ReleaseReport:
         """
         Get a Release Report.
+
+        Parameters
+        ----------
+        release_id : Base64String
+            The unique string identifier of the Release Report.
+
+        Returns
+        -------
+        ReleaseReport
+            The requested Release Report.
 
         Note
         ----
         https://github.com/ZenHubIO/API#get-a-release-report
         """
+        # GET /p1/reports/release/:release_id
         url = f"/p1/reports/release/{release_id}"
-        return self._get(url)
+        return self._get(url)  # type: ignore
 
-    def get_release_reports(self, repo_id):
+    def get_release_reports(self, repo_id: int) -> List[ReleaseReport]:
         """
         Get Release Reports for a Repository.
+
+        Parameters
+        ----------
+        repo_id : int
+            ID of the repository, not its full name.
+
+        Returns
+        -------
+        List of ReleaseReport
 
         Note
         ----
         https://github.com/ZenHubIO/API#get-release-reports-for-a-repository
         """
+        # GET /p1/repositories/:repo_id/reports/releases
         url = f"/p1/repositories/{repo_id}/reports/releases"
-        return self._get(url)
+        return self._get(url)  # type: ignore
 
     def edit_release_report(
-        self, release_id, title, description, start_date, desired_end_date, state=None
-    ):
+        self,
+        release_id: Base64String,
+        title: str,
+        start_date: datetime.datetime,
+        desired_end_date: datetime.datetime,
+        description: str = "",
+        state: Optional[ReportState] = None,
+    ) -> ReleaseReport:
         """
         Edit a Release Report.
 
+        Parameters
+        ----------
+        release_id : Base64String
+            The unique string identifier of the Release Report.
+        title : str
+            Title of the Release Report.
+        start_date : datetime.datetime
+            Start date of the Release Report.
+        desired_end_date : datetime.datetime
+            End date of the Release Report.
+        description : str, optional
+            Start date of the Release Report. The default is ''.
+        state : ReportState, optional
+            The state the Release Report. The default is None.
+
+        Returns
+        -------
+        ReleaseReport
+            The created Release Report.
         Note
         ----
         https://github.com/ZenHubIO/API#edit-a-release-report
         """
+        self._check_dates(start_date, desired_end_date)
+        # PATCH /p1/reports/release/:release_id
         url = f"/p1/reports/release/{release_id}"
         body = {
             "title": title,
@@ -479,56 +569,74 @@ class Zenhub:
             "start_date": self._check_date(start_date),
             "desired_end_date": self._check_date(desired_end_date),
         }
-        if state is not None and state in ["open", "closed"]:
-            body["state"] = state
+        if state is not None:
+            if state in ["open", "closed"]:
+                body["state"] = state
+            else:
+                raise ValueError("`state` must be 'open' or 'closed'")
 
-        return self._patch(url, body)
+        return self._patch(url, body)  # type: ignore
 
-    def add_repo_to_release_report(self, release_id: int, repo_id: int) -> dict:
+    def add_repo_to_release_report(
+        self, release_id: Base64String, repo_id: int
+    ) -> dict:
         """
         Add a Repository to a Release Report.
 
         Parameters
         ----------
-        release_id : int
-            The ID of the Release Report.
+        release_id : Base64String
+            The unique string identifier of the Release Report.
         repo_id : int
             ID of the repository, not its full name.
+
+        Returns
+        -------
+        Empty dict if successful.
 
         Note
         ----
         https://github.com/ZenHubIO/API#add-a-repository-to-a-release-report
         """
+        # POST /p1/reports/release/:release_id/repository/:repo_id
         url = f"/p1/reports/release/{release_id}/repository/{repo_id}"
         return self._post(url)
 
-    def remove_repo_from_release_report(self, release_id: str, repo_id: int) -> dict:
+    def remove_repo_from_release_report(
+        self, release_id: Base64String, repo_id: int
+    ) -> dict:
         """
         Remove a Repository from a Release Report.
 
         Parameters
         ----------
-        release_id : str
+        release_id : Base64String
             The unique string identifier of the Release Report.
         repo_id : int
             ID of the repository, not its full name.
 
+        Returns
+        -------
+        Empty dict if successful.
+
         Note
         ----
+        A release must always have at least one repository.
         https://github.com/ZenHubIO/API#remove-a-repository-from-a-release-report
         """
+        # DELETE /p1/reports/release/:release_id/repository/:repo_id
         url = f"/p1/reports/release/{release_id}/repository/{repo_id}"
         return self._delete(url)
 
     # --- Release Report Issues
     # ------------------------------------------------------------------------
-    def get_release_report_issues(self, release_id: str) -> List[Issue]:
+    def get_release_report_issues(self, release_id: Base64String) -> List[Issue]:
         """
         Get all the Issues for a Release Report.
 
         Parameters
         ----------
-        release_id : str
+        release_id : Base64String
             The unique string identifier of the Release Report.
 
         Returns
@@ -545,9 +653,9 @@ class Zenhub:
 
     def add_or_remove_issues_from_release_report(
         self,
-        release_id: str,
-        add_issues: List[Issue] = [],
-        remove_issues: List[Issue] = [],
+        release_id: Base64String,
+        add_issues: Iterable[Issue] = (),
+        remove_issues: Iterable[Issue] = (),
     ) -> AddRemoveIssueResponse:
         """
         Add or Remove Issues to or from a Release Report.
@@ -557,18 +665,19 @@ class Zenhub:
 
         Parameters
         ----------
-        release_id : str
+        release_id : Base64String
             The unique string identifier of the Release Report.
-        add_issues : List of Issue
-            A list of dictionaries with ``repo_id`` and ``issue_number`` to
-            add to the Release Report.
-        remove_issues : List of Issue
-            A list of dictionaries with ``repo_id`` and ``issue_number`` to
-            remove from the Release Report.
+        add_issues : Iterable of Issue
+            An iterable of dictionaries with ``repo_id`` and ``issue_number``
+            to add to the Release Report.
+        remove_issues : Iterable of Issue
+            An iterable of dictionaries with ``repo_id`` and ``issue_number``
+            to remove from the Release Report.
 
         Returns
         -------
         AddRemoveIssueResponse
+            The added or removed issues.
 
         Note
         ----
@@ -576,5 +685,5 @@ class Zenhub:
         """
         # PATCH /p1/reports/release/:release_id/issues
         url = f"/p1/reports/release/{release_id}/issues"
-        body = {"add_issues": add_issues, "remove_issues": remove_issues}
+        body = {"add_issues": list(add_issues), "remove_issues": list(remove_issues)}
         return self._patch(url, body)  # type: ignore
