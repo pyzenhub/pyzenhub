@@ -1,5 +1,6 @@
 import datetime
 import random
+import uuid
 
 import pytest
 
@@ -20,11 +21,11 @@ RELEASE_REPORT_KEYS = [
 ]
 
 
-@pytest.mark.skipif(
-    RUN_CREATE_TESTS, reason="Create tests are disabled by default."
-)
+# @pytest.mark.skipif(
+#     RUN_CREATE_TESTS, reason="Create tests are disabled by default."
+# )
 def test_create_release_report(zh):
-    title = "Test Release Report"
+    title = f"Test Release Report {uuid.UUID()}"
     description = "Some test description"
     data = zh.create_release_report(
         repo_id=REPO_ID,
@@ -37,6 +38,15 @@ def test_create_release_report(zh):
     assert list(data.keys()) == RELEASE_REPORT_KEYS
     assert data["title"] == title
     assert data["description"] == description
+    release_id = data["release_id"]
+    zh.edit_release_report(
+        release_id,
+        title=title
+        start_date=data["start_date"],
+        desired_end_date=data["desired_end_date"],,
+        description=description,
+        state="closed",
+    )
 
 
 def test_create_release_report_invalid_dates(zh):
