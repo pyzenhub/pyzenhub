@@ -1,12 +1,11 @@
 """Test ZenHub issues API."""
-import os
 import datetime
+import os
 import random
 
 import pytest
 
 from zenhub import Zenhub, ZenhubError
-
 
 # Constants
 # ----------------------------------------------------------------------------
@@ -38,7 +37,12 @@ def zh():
 # ----------------------------------------------------------------------------
 def test_get_issue_data(zh):
     data = zh.get_issue_data(REPO_ID, 1)
-    assert list(data.keys()) == ["plus_ones", "is_epic", "pipelines", "pipeline"]
+    assert list(data.keys()) == [
+        "plus_ones",
+        "is_epic",
+        "pipelines",
+        "pipeline",
+    ]
 
 
 def test_get_issue_data_invalid_issue(zh):
@@ -50,7 +54,9 @@ def test_get_issue_data_invalid_issue(zh):
 
 # --- Release Report
 # ----------------------------------------------------------------------------
-@pytest.mark.skipif(RUN_CREATE_TESTS, reason="Create tests are disabled by default.")
+@pytest.mark.skipif(
+    RUN_CREATE_TESTS, reason="Create tests are disabled by default."
+)
 def test_create_release_report(zh):
     title = "Test Release Report"
     description = "Some test description"
@@ -116,7 +122,8 @@ def test_edit_release_report_invalid(zh):
             RELEASE_REPORT,
             title="Test Release",
             start_date=datetime.datetime.now(),
-            desired_end_date=datetime.datetime.now() + datetime.timedelta(days=60),
+            desired_end_date=datetime.datetime.now()
+            + datetime.timedelta(days=60),
             state="BLAH",
         )
 
@@ -174,14 +181,20 @@ def test_add_or_remove_issues_from_release_report_add(zh):
     data = zh.add_or_remove_issues_from_release_report(
         RELEASE_REPORT, add_issues=[{"repo_id": REPO_ID, "issue_number": 1}]
     )
-    assert data == {"added": [{"repo_id": REPO_ID, "issue_number": 1}], "removed": []}
+    assert data == {
+        "added": [{"repo_id": REPO_ID, "issue_number": 1}],
+        "removed": [],
+    }
 
 
 def test_add_or_remove_issues_from_release_report_remove(zh):
     data = zh.add_or_remove_issues_from_release_report(
         RELEASE_REPORT, remove_issues=[{"repo_id": REPO_ID, "issue_number": 1}]
     )
-    assert data == {"added": [], "removed": [{"repo_id": REPO_ID, "issue_number": 1}]}
+    assert data == {
+        "added": [],
+        "removed": [{"repo_id": REPO_ID, "issue_number": 1}],
+    }
 
 
 def test_add_or_remove_issues_from_release_report_both(zh):

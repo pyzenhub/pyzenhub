@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Copyright (c) 2022 Gonzalo Peña-Castellanos (@goanpeca)
 #
@@ -7,12 +6,17 @@
 # -----------------------------------------------------------------------------
 """ZenHub API."""
 import datetime
-from typing import List, Union, Optional, Literal, Iterable
+from typing import Iterable, List, Optional, Union
 
 import requests
-from typing_extensions import NotRequired, TypedDict
+from typing_extensions import Literal, TypedDict
 
-from .exceptions import InvalidTokenError, APILimitError, NotFoundError, ZenhubError
+from .exceptions import (
+    APILimitError,
+    InvalidTokenError,
+    NotFoundError,
+    ZenhubError,
+)
 
 # Types
 # -----------------------------------------------------------------------------
@@ -60,7 +64,10 @@ class Zenhub:
     }
 
     def __init__(
-        self, token: str, base_url: URLString = DEFAULT_BASE_URL, enterprise: int = 2
+        self,
+        token: str,
+        base_url: URLString = DEFAULT_BASE_URL,
+        enterprise: int = 2,
     ):
         """ZenHub API wrapper."""
         self._session = requests.Session()
@@ -92,7 +99,9 @@ class Zenhub:
         elif status_code == 401:
             raise InvalidTokenError("Invalid token!")
         elif status_code == 403:
-            raise APILimitError("Reached request limit to the API. See API Limits.")
+            raise APILimitError(
+                "Reached request limit to the API. See API Limits."
+            )
         elif status_code == 404:
             raise NotFoundError("Not found!")
         else:
@@ -116,7 +125,7 @@ class Zenhub:
 
     def _make_url(self, url: URLString) -> URLString:
         """Create full api url."""
-        return "{}{}".format(self._base_url, url)
+        return f"{self._base_url}{url}"
 
     def _get(self, url: URLString) -> dict:
         """Send GET request with given url."""
@@ -187,7 +196,9 @@ class Zenhub:
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/events"
         return self._get(url)
 
-    def move_issue(self, workspace_id, repo_id, issue_number, pipeline_id, position):
+    def move_issue(
+        self, workspace_id, repo_id, issue_number, pipeline_id, position
+    ):
         """
         Moves an issue between Pipelines in a Workspace.
 
@@ -207,7 +218,10 @@ class Zenhub:
         ----
         https://github.com/ZenHubIO/API#move-an-issue-between-pipelines
         """
-        url = f"/p2/workspaces/{workspace_id}/repositories/{repo_id}/issues/{issue_number}/moves"
+        url = (
+            f"/p2/workspaces/{workspace_id}/repositories/"
+            f"{repo_id}/issues/{issue_number}/moves"
+        )
         body = {"pipeline_id": pipeline_id, "position": position}
         return self._post(url, body)
 
@@ -269,18 +283,23 @@ class Zenhub:
         ----
         https://github.com/ZenHubIO/API#convert-an-epic-to-an-issue
         """
-        url = f"/p1/repositories/{repo_id}/epics/{issue_number}/convert_to_issue"
+        url = (
+            f"/p1/repositories/{repo_id}/epics/{issue_number}/convert_to_issue"
+        )
         return self._post(url)
 
     def convert_issue_to_epic(self, repo_id, issue_number):
         """
-        Converts an issue to an Epic, along with any issues that should be part of it.
+        Converts an issue to an Epic, along with any issues that should be
+        part of it.
 
         Note
         ----
         https://github.com/ZenHubIO/API#convert-issue-to-epic
         """
-        url = f"/p1/repositories/{repo_id}/issues/{issue_number}/convert_to_epic"
+        url = (
+            f"/p1/repositories/{repo_id}/issues/{issue_number}/convert_to_epic"
+        )
         return self._post(url)
 
     def add_or_remove_issues_to_epic(
@@ -299,7 +318,10 @@ class Zenhub:
         https://github.com/ZenHubIO/API#add-or-remove-issues-to-epic
         """
         url = f"/p1/repositories/{repo_id}/epics/{issue_number}/update_issues"
-        body = {"remove_issues": remove_issues or [], "add_issues": add_issues or []}
+        body = {
+            "remove_issues": remove_issues or [],
+            "add_issues": add_issues or [],
+        }
         return self._post(url, body)
 
     # --- Workspaces
@@ -317,7 +339,8 @@ class Zenhub:
 
     def get_repository_board(self, workspace_id, repo_id):
         """
-        Get ZenHub Board data for a repository (repo_id) within the Workspace (workspace_id).
+        Get ZenHub Board data for a repository (repo_id) within the Workspace
+        (workspace_id).
 
         Note
         ----
@@ -347,7 +370,10 @@ class Zenhub:
         ----
         https://github.com/ZenHubIO/API#set-milestone-start-date
         """
-        url = f"/p1/repositories/{repo_id}/milestones/{milestone_number}/start_date"
+        url = (
+            f"/p1/repositories/{repo_id}/milestones/"
+            f"{milestone_number}/start_date"
+        )
         body = {"start_date": self._check_date(start_date)}
         return self._post(url, body)
 
@@ -359,7 +385,10 @@ class Zenhub:
         ----
         https://github.com/ZenHubIO/API#get-milestone-start-date
         """
-        url = f"/p1/repositories/{repo_id}/milestones/{milestone_number}/start_date"
+        url = (
+            f"/p1/repositories/{repo_id}/milestones/"
+            f"{milestone_number}/start_date"
+        )
         return self._get(url)
 
     # --- Dependencies
@@ -632,7 +661,9 @@ class Zenhub:
 
     # --- Release Report Issues
     # ------------------------------------------------------------------------
-    def get_release_report_issues(self, release_id: Base64String) -> List[Issue]:
+    def get_release_report_issues(
+        self, release_id: Base64String
+    ) -> List[Issue]:
         """
         Get all the Issues for a Release Report.
 
@@ -687,5 +718,8 @@ class Zenhub:
         """
         # PATCH /p1/reports/release/:release_id/issues
         url = f"/p1/reports/release/{release_id}/issues"
-        body = {"add_issues": list(add_issues), "remove_issues": list(remove_issues)}
+        body = {
+            "add_issues": list(add_issues),
+            "remove_issues": list(remove_issues),
+        }
         return self._patch(url, body)  # type: ignore

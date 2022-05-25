@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Copyright (c) 2022 Gonzalo Peña-Castellanos (@goanpeca)
 #
@@ -8,8 +7,14 @@
 """ZenHub API."""
 
 from typing import List, Union
+
 from .core import Zenhub
-from .exceptions import APILimitError, InvalidTokenError, NotFoundError, ZenhubError
+from .exceptions import (
+    APILimitError,
+    InvalidTokenError,
+    NotFoundError,
+    ZenhubError,
+)
 
 __version__ = "0.2.2"
 

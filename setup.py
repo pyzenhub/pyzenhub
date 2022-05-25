@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Copyright (c) Gonzalo Peña-Castellanos (@goanpeca)
 #
@@ -10,7 +9,6 @@
 import ast
 import os
 
-from setuptools import find_packages
 from setuptools import setup
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -18,7 +16,7 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 
 def get_version(module="zenhub"):
     """Get version."""
-    with open(os.path.join(HERE, module, "__init__.py"), "r") as f:
+    with open(os.path.join(HERE, module, "__init__.py")) as f:
         data = f.read()
 
     lines = data.split("\n")
@@ -32,7 +30,7 @@ def get_version(module="zenhub"):
 
 def get_description():
     """Get long description."""
-    with open(os.path.join(HERE, "README.md"), "r") as f:
+    with open(os.path.join(HERE, "README.md")) as f:
         data = f.read()
     return data
 
