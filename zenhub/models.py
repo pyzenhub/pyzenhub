@@ -1,9 +1,9 @@
 """ZenHub API pydantic models."""
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from pydantic import BaseModel
 
-from .types import Base64String, ISO8601DateString
+from .types import Base64String, ISO8601DateString, IssuePosition
 
 
 class PlusOnes(BaseModel):
@@ -57,3 +57,35 @@ class Dependency(BaseModel):
 
 class Dependencies(BaseModel):
     dependencies: List[Dependency]
+
+
+class MilestoneDate(BaseModel):
+    start_date: ISO8601DateString
+
+
+class Workspace(BaseModel):
+    name: str
+    description: Optional[str]
+    id: Base64String
+    repositories: List[int]
+
+
+class Estimate(BaseModel):
+    estimate: int
+
+
+class PipelineIssue(BaseModel):
+    issue_number: int
+    estimate: Optional[dict]  # FIXME: IssueEstimate
+    position: Union[IssuePosition, int]
+    is_epic: bool
+
+
+class BoardPipeline(BaseModel):
+    id: Base64String
+    name: str
+    issues: List[PipelineIssue]
+
+
+class Board(BaseModel):
+    pipelines: List[BoardPipeline]

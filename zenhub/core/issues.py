@@ -1,8 +1,8 @@
 """ZenHub release reports methods."""
 from typing import Union
 
-from ..models import IssueData
-from ..types import Base64String, Estimate, IssuePosition
+from ..models import Estimate, IssueData
+from ..types import Base64String, IssuePosition
 from .base import BaseMixin
 
 
@@ -21,7 +21,37 @@ class IssuesMixin(BaseMixin):
         Returns
         -------
         dict
-            The issue data dictionary.
+            The issue data dictionary. See example response below.
+
+        .. code-block:: python
+            {
+                "estimate": {
+                    "value": 8
+                },
+                "plus_ones": [
+                    {
+                        "created_at": "2015-12-11T18:43:22.296Z"
+                    }
+                ],
+                "pipeline": {
+                    "name": "QA",
+                    "pipeline_id": "5d0a7a9741fd098f6b7f58a7",
+                    "workspace_id": "5d0a7a9741fd098f6b7f58ac"
+                },
+                "pipelines": [
+                    {
+                        "name": "QA",
+                        "pipeline_id": "5d0a7a9741fd098f6b7f58a7",
+                        "workspace_id": "5d0a7a9741fd098f6b7f58ac"
+                    },
+                    {
+                        "name": "Done",
+                        "pipeline_id": "5d0a7cea41fd098f6b7f58b7",
+                        "workspace_id": "5d0a7cea41fd098f6b7f58b8"
+                    }
+                ],
+                "is_epic": True
+            }
 
         Note
         ----
@@ -59,9 +89,69 @@ class IssuesMixin(BaseMixin):
         Returns
         -------
         dict
+            See example response below.
+
+        .. code-block:: python
+            [
+                {
+                    "user_id": 16717,
+                    "type": "estimateIssue",
+                    "created_at": "2015-12-11T19:43:22.296Z",
+                    "from_estimate": {
+                        "value": 8
+                    }
+                },
+                {
+                    "user_id": 16717,
+                    "type": "estimateIssue",
+                    "created_at": "2015-12-11T18:43:22.296Z",
+                    "from_estimate": {
+                        "value": 4
+                    },
+                    "to_estimate": {
+                        "value": 8
+                    }
+                },
+                {
+                    "user_id": 16717,
+                    "type": "estimateIssue",
+                    "created_at": "2015-12-11T13:43:22.296Z",
+                    "to_estimate": {
+                        "value": 4
+                    }
+                },
+                {
+                    "user_id": 16717,
+                    "type": "transferIssue",
+                    "created_at": "2015-12-11T12:43:22.296Z",
+                    "from_pipeline": {
+                        "name": "Backlog"
+                    },
+                    "to_pipeline": {
+                        "name": "In progress"
+                    },
+                    "workspace_id": "5d0a7a9741fd098f6b7f58ac"
+                },
+                {
+                    "user_id": 16717,
+                    "type": "transferIssue",
+                    "created_at": "2015-12-11T11:43:22.296Z",
+                    "to_pipeline": {
+                        "name": "Backlog"
+                    }
+                }
+            ]
 
         Note
         ----
+        - Returns issue events, sorted by creation time, most recent first.
+        - Each event contains the User ID of the user who performed the
+          change, the Creation Date of the event, and the event Type.
+        - Type can be either estimateIssue or transferIssue. The values before
+          and after the event are included in the event data.
+        - transferIssue events include a workspace_id indicating in which
+          Workspace the transfer occurred.
+
         https://github.com/ZenHubIO/API#get-issue-events
         """
         # GET /p1/repositories/:repo_id/issues/:issue_number/events
@@ -75,7 +165,7 @@ class IssuesMixin(BaseMixin):
         issue_number: int,
         pipeline_id: Base64String,
         position: Union[int, IssuePosition],
-    ) -> dict:
+    ) -> bool:
         """
         Moves an issue between Pipelines in a Workspace.
 
@@ -96,7 +186,7 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        Empty dict if succesful.
+        ``True`` if successful.
 
         Note
         ----
@@ -108,7 +198,7 @@ class IssuesMixin(BaseMixin):
             f"{repo_id}/issues/{issue_number}/moves"
         )
         body = {"pipeline_id": pipeline_id, "position": position}
-        return self._post(url, body)
+        return True if self._post(url, body) == {} else False
 
     def move_issue_in_oldest_workspace(
         self,
@@ -116,7 +206,7 @@ class IssuesMixin(BaseMixin):
         issue_number: int,
         pipeline_id: Base64String,
         position: Union[int, IssuePosition],
-    ) -> dict:
+    ) -> bool:
         """
         Moves an issue between Pipelines in a Workspace.
 
@@ -135,7 +225,7 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        Empty dict if succesful.
+        ``True`` if successful.
 
         Note
         ----
@@ -144,7 +234,7 @@ class IssuesMixin(BaseMixin):
         # POST /p1/repositories/:repo_id/issues/:issue_number/moves
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/moves"
         body = {"pipeline_id": pipeline_id, "position": position}
-        return self._post(url, body)
+        return True if self._post(url, body) == {} else False
 
     def set_issue_estimate(
         self, repo_id: int, issue_number: int, estimate: int
@@ -163,7 +253,12 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        Estimate
+        Estimate. See example response below.
+
+        .. code-block:: python
+            {
+                "estimate": 15,
+            }
 
         Note
         ----

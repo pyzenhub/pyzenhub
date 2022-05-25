@@ -6,6 +6,7 @@ from ..types import URLString
 from .dependencies import DependenciesMixin
 from .epics import EpicsMixin
 from .issues import IssuesMixin
+from .milestones import MilestonesMixin
 from .release_report_issues import ReleaseReportIssuesMixin
 from .release_reports import ReleaseReportsMixin
 from .workspaces import WorkspacesMixin
@@ -18,6 +19,7 @@ class Zenhub(
     IssuesMixin,
     EpicsMixin,
     WorkspacesMixin,
+    MilestonesMixin,
     DependenciesMixin,
     ReleaseReportsMixin,
     ReleaseReportIssuesMixin,
