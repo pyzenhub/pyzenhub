@@ -1,4 +1,4 @@
-"""ZenHub release reports methods."""
+"""ZenHub dependencies methods."""
 from ..models import Dependencies
 from .base import BaseMixin
 

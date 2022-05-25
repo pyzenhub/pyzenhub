@@ -1,4 +1,4 @@
-"""ZenHub release reports methods."""
+"""ZenHub epics methods."""
 from typing import Iterable
 
 from ..models import Issue

@@ -1,4 +1,4 @@
-"""ZenHub release reports methods."""
+"""ZenHub issues methods."""
 from typing import Union
 
 from ..models import Estimate, IssueData

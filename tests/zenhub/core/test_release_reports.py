@@ -6,6 +6,7 @@ import pytest
 
 from zenhub import ZenhubError
 from zenhub.utils import string_to_date
+
 from .data import RELEASE_REPORT, REPO_ID
 
 RELEASE_REPORT_KEYS = [

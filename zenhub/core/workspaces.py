@@ -1,4 +1,4 @@
-"""ZenHub release reports methods."""
+"""ZenHub workspace methods."""
 from typing import List
 
 from ..models import Board, Workspace
@@ -9,7 +9,7 @@ from .base import BaseMixin
 class WorkspacesMixin(BaseMixin):
     def get_workspaces(self, repo_id: int) -> List[dict]:
         """
-        Gets all Workspaces containing repo_id.
+        Gets all Workspaces containing ``repo_id``.
 
         Parameters
         ----------
@@ -53,8 +53,8 @@ class WorkspacesMixin(BaseMixin):
         self, workspace_id: Base64String, repo_id: int
     ) -> dict:
         """
-        Get ZenHub Board data for a repository (repo_id) within the Workspace
-        (workspace_id).
+        Get ZenHub Board data for a repository (``repo_id``) within the
+        Workspace (``workspace_id``).
 
         Parameters
         ----------

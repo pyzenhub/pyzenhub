@@ -27,7 +27,7 @@ class MilestonesMixin(BaseMixin):
 
         Returns
         -------
-        MilestoneDate
+        dict
             The milestone with the new start date. See example below.
 
         .. code-block:: python
@@ -65,7 +65,7 @@ class MilestonesMixin(BaseMixin):
 
         Returns
         -------
-        MilestoneDate
+        dict
             The milestone with the current start date. See example below.
 
         .. code-block:: python
