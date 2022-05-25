@@ -5,8 +5,8 @@ import uuid
 import pytest
 
 from zenhub import ZenhubError
-
-from .data import RELEASE_REPORT, REPO_ID, RUN_CREATE_TESTS
+from zenhub.utils import string_to_date
+from .data import RELEASE_REPORT, REPO_ID
 
 RELEASE_REPORT_KEYS = [
     "release_id",
@@ -21,11 +21,8 @@ RELEASE_REPORT_KEYS = [
 ]
 
 
-# @pytest.mark.skipif(
-#     RUN_CREATE_TESTS, reason="Create tests are disabled by default."
-# )
 def test_create_release_report(zh):
-    title = f"Test Release Report {uuid.UUID()}"
+    title = f"Test Release Report {uuid.uuid4()}"
     description = "Some test description"
     data = zh.create_release_report(
         repo_id=REPO_ID,
@@ -41,9 +38,9 @@ def test_create_release_report(zh):
     release_id = data["release_id"]
     zh.edit_release_report(
         release_id,
-        title=title
-        start_date=data["start_date"],
-        desired_end_date=data["desired_end_date"],,
+        title=title,
+        start_date=string_to_date(data["start_date"]),
+        desired_end_date=string_to_date(data["desired_end_date"]),
         description=description,
         state="closed",
     )
