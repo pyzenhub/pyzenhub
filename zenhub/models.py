@@ -12,6 +12,28 @@ from pydantic import BaseModel
 from .types import Base64String, ISO8601DateString
 
 
+class PlusOnes(BaseModel):
+    created_at: ISO8601DateString
+
+
+class Pipeline(BaseModel):
+    name: str
+    pipeline_id: Base64String
+    workspace_id: Base64String
+
+
+class IssueEstimate(BaseModel):
+    value: int
+
+
+class IssueData(BaseModel):
+    estimate: Optional[IssueEstimate]
+    is_epic: bool
+    plus_ones: List[PlusOnes]
+    pipeline: Optional[Pipeline]
+    pipelines: Optional[List[Pipeline]]
+
+
 class Issue(BaseModel):
     repo_id: int
     issue_number: int
@@ -31,7 +53,4 @@ class ReleaseReport(BaseModel):
     created_at: ISO8601DateString
     closed_at: Optional[ISO8601DateString]
     state: str
-
-
-class ReleaseReportWithRepositories(ReleaseReport):
-    repositories: List[int]
+    repositories: Optional[List[int]]

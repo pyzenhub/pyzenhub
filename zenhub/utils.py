@@ -7,6 +7,14 @@
 """ZenHub API utilities."""
 import datetime
 
+import requests
+
+from .exceptions import (
+    APILimitError,
+    InvalidTokenError,
+    NotFoundError,
+    ZenhubError,
+)
 from .types import ISO8601DateString
 
 
@@ -30,3 +38,28 @@ def check_dates(
     if start_date > desired_end_date:
         raise ValueError("Start date must be before end date.")
     return True
+
+
+def parse_response_contents(response: requests.Response) -> dict:
+    """Parse response and convert to json if possible."""
+    status_code = response.status_code
+    try:
+        contents = response.json()
+    except Exception:
+        contents = {}
+
+    if status_code in [200, 204]:
+        pass
+    elif status_code == 401:
+        raise InvalidTokenError("Invalid token!")
+    elif status_code == 403:
+        raise APILimitError(
+            "Reached request limit to the API. See API Limits."
+        )
+    elif status_code == 404:
+        raise NotFoundError("Not found!")
+    else:
+        message = contents.get("message", "Unknown error!")
+        raise ZenhubError(message)
+
+    return contents

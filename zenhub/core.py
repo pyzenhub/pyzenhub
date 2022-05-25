@@ -11,18 +11,7 @@ from typing import Iterable, List, Optional, Union
 import requests
 from typing_extensions import NotRequired, TypedDict
 
-from .exceptions import (
-    APILimitError,
-    InvalidTokenError,
-    NotFoundError,
-    ZenhubError,
-)
-from .models import (
-    AddRemoveIssue,
-    Issue,
-    ReleaseReport,
-    ReleaseReportWithRepositories,
-)
+from .models import AddRemoveIssue, Issue, IssueData, ReleaseReport
 from .types import (
     Base64String,
     ISO8601DateString,
@@ -30,7 +19,7 @@ from .types import (
     ReportState,
     URLString,
 )
-from .utils import check_dates, date_to_string
+from .utils import check_dates, date_to_string, parse_response_contents
 
 
 # Types
@@ -42,17 +31,13 @@ class Workspace(TypedDict):
     repositories: List[int]
 
 
-class IssueEstimate(TypedDict):
-    value: int
-
-
 class Estimate(TypedDict):
     estimate: int
 
 
 class PipelineIssue(TypedDict):
     issue_number: int
-    estimate: IssueEstimate
+    estimate: dict  # IssueEstimate
     position: NotRequired[IssuePosition]
     is_epic: NotRequired[bool]
 
@@ -78,24 +63,6 @@ class Dependency(TypedDict):
 
 class Dependencies(TypedDict):
     dependencies: List[Dependency]
-
-
-class PlusOnes(TypedDict):
-    created_at: ISO8601DateString
-
-
-class Pipeline(TypedDict):
-    name: str
-    pipeline_id: Base64String
-    workspace_id: Base64String
-
-
-class IssueData(TypedDict):
-    estimate: IssueEstimate
-    is_epic: bool
-    plus_ones: List[PlusOnes]
-    pipeline: Pipeline
-    pipelines: List[Pipeline]
 
 
 # Constants
@@ -133,31 +100,6 @@ class Zenhub:
 
     # --- Helpers
     # ------------------------------------------------------------------------
-    @staticmethod
-    def _parse_response_contents(response: requests.Response) -> dict:
-        """Parse response and convert to json if possible."""
-        status_code = response.status_code
-        try:
-            contents = response.json()
-        except Exception:
-            contents = {}
-
-        if status_code in [200, 204]:
-            pass
-        elif status_code == 401:
-            raise InvalidTokenError("Invalid token!")
-        elif status_code == 403:
-            raise APILimitError(
-                "Reached request limit to the API. See API Limits."
-            )
-        elif status_code == 404:
-            raise NotFoundError("Not found!")
-        else:
-            message = contents.get("message", "Unknown error!")
-            raise ZenhubError(message)
-
-        return contents
-
     def _make_url(self, url: URLString) -> URLString:
         """Create full api url."""
         return f"{self._base_url}{url}"
@@ -165,31 +107,31 @@ class Zenhub:
     def _get(self, url: URLString) -> dict:
         """Send GET request with given url."""
         response = self._session.get(url=self._make_url(url))
-        return self._parse_response_contents(response)
+        return parse_response_contents(response)
 
     def _post(self, url: URLString, body: dict = {}) -> dict:
         """Send POST request with given url and data."""
         response = self._session.post(url=self._make_url(url), json=body)
-        return self._parse_response_contents(response)
+        return parse_response_contents(response)
 
     def _put(self, url: URLString, body: dict) -> dict:
         """Send PUT request with given url and data."""
         response = self._session.put(url=self._make_url(url), json=body)
-        return self._parse_response_contents(response)
+        return parse_response_contents(response)
 
     def _delete(self, url: URLString, body: dict = {}) -> dict:
         """Send DELETE request with given url and data."""
         response = self._session.delete(url=self._make_url(url), json=body)
-        return self._parse_response_contents(response)
+        return parse_response_contents(response)
 
     def _patch(self, url: URLString, body: dict) -> dict:
         """Send PATCH request with given url and data."""
         response = self._session.patch(url=self._make_url(url), json=body)
-        return self._parse_response_contents(response)
+        return parse_response_contents(response)
 
     # --- Issues
     # ------------------------------------------------------------------------
-    def get_issue_data(self, repo_id: int, issue_number: int) -> IssueData:
+    def get_issue_data(self, repo_id: int, issue_number: int) -> dict:
         """
         Get the data for a specific issue.
 
@@ -202,7 +144,8 @@ class Zenhub:
 
         Returns
         -------
-        IssueData
+        dict
+            The issue data dictionary.
 
         Note
         ----
@@ -223,7 +166,8 @@ class Zenhub:
         """
         # GET /p1/repositories/:repo_id/issues/:issue_number
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}"
-        return self._get(url)  # type: ignore
+        data = self._get(url)
+        return IssueData.parse_obj(data).dict(include=data.keys())
 
     def get_issue_events(self, repo_id: int, issue_number: int) -> dict:
         """
@@ -686,7 +630,7 @@ class Zenhub:
         desired_end_date: datetime.datetime,
         description: str = "",
         repositories: Iterable[int] = (),
-    ) -> ReleaseReportWithRepositories:
+    ) -> dict:
         """
         Create a Release Report.
 
@@ -729,7 +673,8 @@ class Zenhub:
         if repositories:
             body["repositories"] = list(repositories)  # type: ignore
 
-        return ReleaseReportWithRepositories.parse_obj(self._post(url, body))
+        data = self._post(url, body)
+        return ReleaseReport.parse_obj(data).dict(include=data.keys())
 
     def get_release_report(self, release_id: Base64String) -> dict:
         """
@@ -751,7 +696,8 @@ class Zenhub:
         """
         # GET /p1/reports/release/:release_id
         url = f"/p1/reports/release/{release_id}"
-        return ReleaseReportWithRepositories.parse_obj(self._get(url)).dict()
+        data = self._get(url)
+        return ReleaseReport.parse_obj(data).dict(include=data.keys())
 
     def get_release_reports(self, repo_id: int) -> List[dict]:
         """
@@ -773,7 +719,8 @@ class Zenhub:
         # GET /p1/repositories/:repo_id/reports/releases
         url = f"/p1/repositories/{repo_id}/reports/releases"
         data = [
-            ReleaseReport.parse_obj(item).dict() for item in self._get(url)
+            ReleaseReport.parse_obj(item).dict(include=item.keys())
+            for item in self._get(url)
         ]
         return data
 
@@ -827,9 +774,8 @@ class Zenhub:
             else:
                 raise ValueError("`state` must be 'open' or 'closed'")
 
-        return ReleaseReportWithRepositories.parse_obj(
-            self._patch(url, body)
-        ).dict()
+        data = self._patch(url, body)
+        return ReleaseReport.parse_obj(data).dict(include=data.keys())
 
     def add_repo_to_release_report(
         self, release_id: Base64String, repo_id: int
@@ -897,7 +843,13 @@ class Zenhub:
 
         Returns
         -------
-        List of dictionaries.
+        List of dictionaries. See example response below.
+
+        .. code-block:: python
+            [
+                { "repo_id": 103707262, "issue_number": 2 },
+                { "repo_id": 103707262, "issue_number": 3 },
+            ]
 
         Note
         ----
@@ -905,7 +857,10 @@ class Zenhub:
         """
         # GET /p1/reports/release/:release_id/issues
         url = f"/p1/reports/release/{release_id}/issues"
-        return [Issue.parse_obj(issue).dict() for issue in self._get(url)]
+        return [
+            Issue.parse_obj(item).dict(include=item.keys())
+            for item in self._get(url)
+        ]
 
     def add_or_remove_issues_from_release_report(
         self,
@@ -933,7 +888,13 @@ class Zenhub:
         Returns
         -------
         dict
-            The added or removed issues.
+            The added or removed issues. See example response below.
+
+        .. code-block:: python
+            {
+                "added": [{ "repo_id": 103707262, "issue_number": 3 }],
+                "removed": [],
+            }
 
         Note
         ----
@@ -945,4 +906,5 @@ class Zenhub:
             'add_issues': list(add_issues),
             'remove_issues': list(remove_issues),
         }
-        return AddRemoveIssue.parse_obj(self._patch(url, body)).dict()
+        data = self._patch(url, body)
+        return AddRemoveIssue.parse_obj(data).dict(include=data.keys())

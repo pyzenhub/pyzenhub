@@ -38,6 +38,8 @@ def zh():
 def test_get_issue_data(zh):
     data = zh.get_issue_data(REPO_ID, 1)
     assert data
+    data = zh.get_issue_data(REPO_ID, 2)
+    assert data
 
 
 def test_get_issue_data_invalid_issue(zh):

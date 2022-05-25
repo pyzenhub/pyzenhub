@@ -8,14 +8,13 @@
 """Setup script for pyzenhub."""
 import ast
 import os
-from typing import Tuple
 
 from setuptools import setup
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 
-def get_version(module: str = "zenhub") -> Tuple:
+def get_version(module: str = "zenhub") -> str:
     """Get version."""
     with open(os.path.join(HERE, module, "__init__.py")) as f:
         data = f.read()
