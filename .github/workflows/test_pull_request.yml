@@ -5,7 +5,7 @@ on:
     branches:
       - main
     tags:
-      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10  deploy:
+      - "v*"
   pull_request:
     branches:
       - main
@@ -77,7 +77,7 @@ jobs:
     # this will run when you have tagged a commit, starting with "v*"
     # and requires that you have put your twine API key in your
     # github secrets (see readme for details)
-    needs: [test, check_manifest]
+    needs: [test, check-manifest]
     if: ${{ github.repository == 'goanpeca/pyzenhub' && contains(github.ref, 'tags') }}
     runs-on: ubuntu-latest
     steps:
