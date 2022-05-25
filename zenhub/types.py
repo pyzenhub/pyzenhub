@@ -1,3 +1,4 @@
+"""Custom types."""
 from typing_extensions import Literal
 
 URLString = str

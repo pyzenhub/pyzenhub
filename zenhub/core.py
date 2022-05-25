@@ -1,9 +1,3 @@
-# -----------------------------------------------------------------------------
-# Copyright (c) 2022 Gonzalo Peña-Castellanos (@goanpeca)
-#
-# Licensed under the terms of the MIT License
-# (See LICENSE.txt for details)
-# -----------------------------------------------------------------------------
 """ZenHub API."""
 import datetime
 from typing import Iterable, List, Optional, Union
@@ -653,7 +647,20 @@ class Zenhub:
         Returns
         -------
         ReleaseReportWithRepositories
-            The created Release Report.
+            The created Release Report. See example response below.
+
+        .. code-block:: python
+            {
+                "release_id": "59dff4f508399a35a276a1ea",
+                "title": "Great title",
+                "description": "Amazing description",
+                "start_date": "2007-01-01T00:00:00.000Z",
+                "desired_end_date": "2007-01-01T00:00:00.000Z",
+                "created_at": "2017-10-12T23:04:21.795Z",
+                "closed_at": None,
+                "state": "open",
+                "repositories": [103707262]
+            }
 
         Note
         ----
@@ -688,8 +695,20 @@ class Zenhub:
         Returns
         -------
         dict
-            The requested Release Report.
+            The requested Release Report. See example response below.
 
+        .. code-block:: python
+            {
+                "release_id": "59d3cd520a430a6344fd3bdb",
+                "title": "Test release",
+                "description": "",
+                "start_date": "2017-10-01T19:00:00.000Z",
+                "desired_end_date": "2017-10-03T19:00:00.000Z",
+                "created_at": "2017-10-03T17:48:02.701Z",
+                "closed_at": None,
+                "state": "open",
+                "repositories": [105683718]
+            }
         Note
         ----
         https://github.com/ZenHubIO/API#get-a-release-report
@@ -710,7 +729,31 @@ class Zenhub:
 
         Returns
         -------
-        List of dictionaries.
+        List of dictionaries. See example response below.
+
+        .. code-block:: python
+            [
+                {
+                    "release_id": "59cbf2fde010f7a5207406e8",
+                    "title": "Great title for release 1",
+                    "description": "Great description for release",
+                    "start_date": "2000-10-10T00:00:00.000Z",
+                    "desired_end_date": "2010-10-10T00:00:00.000Z",
+                    "created_at": "2017-09-27T18:50:37.418Z",
+                    "closed_at": None,
+                    "state": "open"
+                },
+                {
+                    "release_id": "59cbf2fde010f7a5207406e8",
+                    "title": "Great title for release 2",
+                    "description": "Great description for release",
+                    "start_date": "2000-10-10T00:00:00.000Z",
+                    "desired_end_date": "2010-10-10T00:00:00.000Z",
+                    "created_at": "2017-09-27T18:50:37.418Z",
+                    "closed_at": None,
+                    "state": "open"
+                }
+            ]
 
         Note
         ----
@@ -754,7 +797,21 @@ class Zenhub:
         Returns
         -------
         dict
-            The created Release Report.
+            The created Release Report. See example response below.
+
+        .. code-block:: python
+            {
+                "release_id": "59d3d6438b3f16667f9e7174",
+                "title": "Amazing title",
+                "description": "Amazing description",
+                "start_date": "2007-01-01T00:00:00.000Z",
+                "desired_end_date": "2007-01-01T00:00:00.000Z",
+                "created_at": "2017-10-03T18:26:11.700Z",
+                "closed_at": "2017-10-03T18:26:11.700Z",
+                "state": "closed",
+                "repositories": [105683567, 105683718]
+            }
+
         Note
         ----
         https://github.com/ZenHubIO/API#edit-a-release-report

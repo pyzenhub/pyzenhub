@@ -1,9 +1,3 @@
-# -----------------------------------------------------------------------------
-# Copyright (c) 2022 Gonzalo Peña-Castellanos (@goanpeca)
-#
-# Licensed under the terms of the MIT License
-# (See LICENSE.txt for details)
-# -----------------------------------------------------------------------------
 """ZenHub API utilities."""
 import datetime
 
