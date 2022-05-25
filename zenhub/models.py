@@ -9,7 +9,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-from .types import ISO8601DateString, Base64String
+from .types import Base64String, ISO8601DateString
+
 
 class Issue(BaseModel):
     repo_id: int

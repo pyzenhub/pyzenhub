@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - main
 
 jobs:
   typing:
@@ -19,3 +22,5 @@ jobs:
           pip install -e .
       - name: Run mypy on typed modules
         run: mypy zenhub
+      - name: Run mypy on setup.py
+        run: mypy setup.py
