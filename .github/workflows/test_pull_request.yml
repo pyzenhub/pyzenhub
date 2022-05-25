@@ -62,4 +62,4 @@ jobs:
       - name: Run pytest
         env:
           ZENHUB_TEST_TOKEN:  ${{ secrets.ZENHUB_TEST_TOKEN }}
-        run: pytest zenhub --cov=zenhub
+        run: pytest tests --cov=zenhub

@@ -2,3 +2,4 @@ include LICENSE.txt
 include *.md
 include *.yaml
 recursive-include zenhub *.py
+recursive-exclude tests *.py
