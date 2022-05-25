@@ -14,7 +14,7 @@ from .types import ISO8601DateString
 
 def date_to_string(date: datetime.datetime) -> ISO8601DateString:
     """Convert a datetime object to a ISO8601 date string."""
-    return date.replace(microsecond=0).isoformat() + "Z"
+    return date.isoformat(timespec='milliseconds') + "Z"
 
 
 def string_to_date(date_string: ISO8601DateString) -> datetime.datetime:

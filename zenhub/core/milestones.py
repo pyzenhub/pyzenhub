@@ -1,4 +1,4 @@
-"""ZenHub release reports methods."""
+"""ZenHub milestone methods."""
 import datetime
 
 from ..models import MilestoneDate
