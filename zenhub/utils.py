@@ -7,7 +7,7 @@
 """ZenHub API utilities."""
 import datetime
 
-ISO8601DateString = str
+from .types import ISO8601DateString
 
 
 def date_to_string(date: datetime.datetime) -> ISO8601DateString:

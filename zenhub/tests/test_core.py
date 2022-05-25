@@ -102,6 +102,7 @@ def test_create_release_report_invalid_dates(zh):
 def test_get_release_report(zh):
     data = zh.get_release_report(RELEASE_REPORT)
     assert list(data.keys()) == RELEASE_REPORT_KEYS
+    print(data)
     assert data["title"] == "Test Release"
 
 
@@ -155,7 +156,7 @@ def test_add_repo_to_release_report(zh):
         RELEASE_REPORT,
         REPO_ID,
     )
-    assert data == {}
+    assert data
 
 
 def test_remove_repo_from_release_report(zh):
@@ -212,7 +213,7 @@ def test_add_or_remove_issues_from_release_report_remove(zh):
 def test_add_or_remove_issues_from_release_report_both(zh):
     data = zh.add_or_remove_issues_from_release_report(
         RELEASE_REPORT,
-        add_issues=[{"repo_id": REPO_ID, "issue_number": 2}],
+        add_issues=({"repo_id": REPO_ID, "issue_number": 2},),
         remove_issues=[{"repo_id": REPO_ID, "issue_number": 1}],
     )
     assert data == {

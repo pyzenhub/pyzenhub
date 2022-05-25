@@ -9,7 +9,7 @@ import datetime
 from typing import Iterable, List, Optional, Union
 
 import requests
-from typing_extensions import Literal, NotRequired, TypedDict
+from typing_extensions import NotRequired, TypedDict
 
 from .exceptions import (
     APILimitError,
@@ -17,40 +17,24 @@ from .exceptions import (
     NotFoundError,
     ZenhubError,
 )
-from .utils import ISO8601DateString, check_dates, date_to_string
+from .models import (
+    AddRemoveIssue,
+    Issue,
+    ReleaseReport,
+    ReleaseReportWithRepositories,
+)
+from .types import (
+    Base64String,
+    ISO8601DateString,
+    IssuePosition,
+    ReportState,
+    URLString,
+)
+from .utils import check_dates, date_to_string
+
 
 # Types
 # -----------------------------------------------------------------------------
-URLString = str
-Base64String = str
-ReportState = Literal["open", "closed"]
-
-
-class Issue(TypedDict):
-    repo_id: int
-    issue_number: int
-
-
-IssuePosition = Literal["top", "bottom"]
-
-
-class AddRemoveIssue(TypedDict):
-    added: List[Issue]
-    removed: List[Issue]
-
-
-class ReleaseReport(TypedDict):
-    release_id: Base64String
-    title: str
-    description: str
-    start_date: ISO8601DateString
-    desired_end_date: ISO8601DateString
-    created_at: ISO8601DateString
-    closed_at: Optional[ISO8601DateString]
-    state: str
-    repositories: List[int]
-
-
 class Workspace(TypedDict):
     name: str
     description: str
@@ -69,7 +53,7 @@ class Estimate(TypedDict):
 class PipelineIssue(TypedDict):
     issue_number: int
     estimate: IssueEstimate
-    position: NotRequired[int]
+    position: NotRequired[IssuePosition]
     is_epic: NotRequired[bool]
 
 
@@ -94,9 +78,6 @@ class Dependency(TypedDict):
 
 class Dependencies(TypedDict):
     dependencies: List[Dependency]
-
-
-PatchResponse = Union[AddRemoveIssue, None]
 
 
 class PlusOnes(TypedDict):
@@ -201,10 +182,10 @@ class Zenhub:
         response = self._session.delete(url=self._make_url(url), json=body)
         return self._parse_response_contents(response)
 
-    def _patch(self, url: URLString, body: dict) -> PatchResponse:
+    def _patch(self, url: URLString, body: dict) -> dict:
         """Send PATCH request with given url and data."""
         response = self._session.patch(url=self._make_url(url), json=body)
-        return self._parse_response_contents(response)  # type: ignore
+        return self._parse_response_contents(response)
 
     # --- Issues
     # ------------------------------------------------------------------------
@@ -705,7 +686,7 @@ class Zenhub:
         desired_end_date: datetime.datetime,
         description: str = "",
         repositories: Iterable[int] = (),
-    ) -> ReleaseReport:
+    ) -> ReleaseReportWithRepositories:
         """
         Create a Release Report.
 
@@ -727,7 +708,7 @@ class Zenhub:
 
         Returns
         -------
-        ReleaseReport
+        ReleaseReportWithRepositories
             The created Release Report.
 
         Note
@@ -748,9 +729,9 @@ class Zenhub:
         if repositories:
             body["repositories"] = list(repositories)  # type: ignore
 
-        return self._post(url, body)  # type: ignore
+        return ReleaseReportWithRepositories.parse_obj(self._post(url, body))
 
-    def get_release_report(self, release_id: Base64String) -> ReleaseReport:
+    def get_release_report(self, release_id: Base64String) -> dict:
         """
         Get a Release Report.
 
@@ -761,7 +742,7 @@ class Zenhub:
 
         Returns
         -------
-        ReleaseReport
+        dict
             The requested Release Report.
 
         Note
@@ -770,9 +751,9 @@ class Zenhub:
         """
         # GET /p1/reports/release/:release_id
         url = f"/p1/reports/release/{release_id}"
-        return self._get(url)  # type: ignore
+        return ReleaseReportWithRepositories.parse_obj(self._get(url)).dict()
 
-    def get_release_reports(self, repo_id: int) -> List[ReleaseReport]:
+    def get_release_reports(self, repo_id: int) -> List[dict]:
         """
         Get Release Reports for a Repository.
 
@@ -783,7 +764,7 @@ class Zenhub:
 
         Returns
         -------
-        List of ReleaseReport
+        List of dictionaries.
 
         Note
         ----
@@ -791,7 +772,10 @@ class Zenhub:
         """
         # GET /p1/repositories/:repo_id/reports/releases
         url = f"/p1/repositories/{repo_id}/reports/releases"
-        return self._get(url)  # type: ignore
+        data = [
+            ReleaseReport.parse_obj(item).dict() for item in self._get(url)
+        ]
+        return data
 
     def edit_release_report(
         self,
@@ -801,7 +785,7 @@ class Zenhub:
         desired_end_date: datetime.datetime,
         description: str = "",
         state: Optional[ReportState] = None,
-    ) -> ReleaseReport:
+    ) -> dict:
         """
         Edit a Release Report.
 
@@ -822,7 +806,7 @@ class Zenhub:
 
         Returns
         -------
-        ReleaseReport
+        dict
             The created Release Report.
         Note
         ----
@@ -843,11 +827,13 @@ class Zenhub:
             else:
                 raise ValueError("`state` must be 'open' or 'closed'")
 
-        return self._patch(url, body)  # type: ignore
+        return ReleaseReportWithRepositories.parse_obj(
+            self._patch(url, body)
+        ).dict()
 
     def add_repo_to_release_report(
         self, release_id: Base64String, repo_id: int
-    ) -> dict:
+    ) -> bool:
         """
         Add a Repository to a Release Report.
 
@@ -860,7 +846,7 @@ class Zenhub:
 
         Returns
         -------
-        Empty dictionary if successful.
+        ``True`` if successful.
 
         Note
         ----
@@ -868,11 +854,11 @@ class Zenhub:
         """
         # POST /p1/reports/release/:release_id/repository/:repo_id
         url = f"/p1/reports/release/{release_id}/repository/{repo_id}"
-        return self._post(url)
+        return True if self._post(url) == {} else False
 
     def remove_repo_from_release_report(
         self, release_id: Base64String, repo_id: int
-    ) -> dict:
+    ) -> bool:
         """
         Remove a Repository from a Release Report.
 
@@ -885,7 +871,7 @@ class Zenhub:
 
         Returns
         -------
-        Empty dictionary if successful.
+        ``True`` if successful.
 
         Note
         ----
@@ -894,13 +880,13 @@ class Zenhub:
         """
         # DELETE /p1/reports/release/:release_id/repository/:repo_id
         url = f"/p1/reports/release/{release_id}/repository/{repo_id}"
-        return self._delete(url)
+        return True if self._delete(url) == {} else False
 
     # --- Release Report Issues
     # ------------------------------------------------------------------------
     def get_release_report_issues(
         self, release_id: Base64String
-    ) -> List[Issue]:
+    ) -> List[dict]:
         """
         Get all the Issues for a Release Report.
 
@@ -911,7 +897,7 @@ class Zenhub:
 
         Returns
         -------
-        List of Issue objects.
+        List of dictionaries.
 
         Note
         ----
@@ -919,14 +905,14 @@ class Zenhub:
         """
         # GET /p1/reports/release/:release_id/issues
         url = f"/p1/reports/release/{release_id}/issues"
-        return self._get(url)  # type: ignore
+        return [Issue.parse_obj(issue).dict() for issue in self._get(url)]
 
     def add_or_remove_issues_from_release_report(
         self,
         release_id: Base64String,
         add_issues: Iterable[Issue] = (),
         remove_issues: Iterable[Issue] = (),
-    ) -> AddRemoveIssue:
+    ) -> dict:
         """
         Add or Remove Issues to or from a Release Report.
 
@@ -946,7 +932,7 @@ class Zenhub:
 
         Returns
         -------
-        AddRemoveIssue
+        dict
             The added or removed issues.
 
         Note
@@ -956,7 +942,7 @@ class Zenhub:
         # PATCH /p1/reports/release/:release_id/issues
         url = f"/p1/reports/release/{release_id}/issues"
         body = {
-            "add_issues": list(add_issues),
-            "remove_issues": list(remove_issues),
+            'add_issues': list(add_issues),
+            'remove_issues': list(remove_issues),
         }
-        return self._patch(url, body)  # type: ignore
+        return AddRemoveIssue.parse_obj(self._patch(url, body)).dict()

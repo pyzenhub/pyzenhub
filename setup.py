@@ -35,7 +35,12 @@ def get_description() -> str:
     return data
 
 
-REQUIREMENTS = ["requests", "typing_extensions", "types-requests"]
+REQUIREMENTS = [
+    "pydantic>=1.5.1",
+    "requests",
+    "types-requests",
+    "typing_extensions",
+]
 
 setup(
     name="pyzenhub",
