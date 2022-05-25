@@ -48,3 +48,12 @@ class ReleaseReport(BaseModel):
     closed_at: Optional[ISO8601DateString]
     state: str
     repositories: Optional[List[int]]
+
+
+class Dependency(BaseModel):
+    blocking: Issue
+    blocked: Issue
+
+
+class Dependencies(BaseModel):
+    dependencies: List[Dependency]
