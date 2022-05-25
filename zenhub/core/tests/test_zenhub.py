@@ -1,9 +1,8 @@
 """Test ZenHub issues API."""
-import os
-
 import pytest
 
 from zenhub import ZenhubError
+
 from .data import REPO_ID
 
 # Constants
@@ -19,6 +18,7 @@ RELEASE_REPORT_KEYS = [
     "state",
     "repositories",
 ]
+
 
 # --- Issues
 # ----------------------------------------------------------------------------

@@ -2,9 +2,10 @@
 import datetime
 from typing import List
 
-from ..types import Workspace, MilestoneDate, Board, Base64String
+from ..types import Base64String, Board, MilestoneDate, Workspace
 from ..utils import date_to_string
 from .base import BaseMixin
+
 
 class WorkspacesMixin(BaseMixin):
     def get_workspaces(self, repo_id: int) -> List[Workspace]:

@@ -2,6 +2,7 @@
 from ..models import Dependencies
 from .base import BaseMixin
 
+
 class DependenciesMixin(BaseMixin):
     def get_dependencies(self, repo_id: int) -> Dependencies:
         """

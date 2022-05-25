@@ -1,9 +1,10 @@
 """ZenHub release reports methods."""
 from typing import Union
 
-from ..types import Base64String, IssuePosition, Estimate
-from .base import BaseMixin
 from ..models import IssueData
+from ..types import Base64String, Estimate, IssuePosition
+from .base import BaseMixin
+
 
 class IssuesMixin(BaseMixin):
     def get_issue_data(self, repo_id: int, issue_number: int) -> dict:

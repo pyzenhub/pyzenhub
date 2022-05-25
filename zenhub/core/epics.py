@@ -4,6 +4,7 @@ from typing import Iterable
 from ..models import Issue
 from .base import BaseMixin
 
+
 class EpicsMixin(BaseMixin):
     def get_epics(self, repo_id: int) -> dict:
         """
