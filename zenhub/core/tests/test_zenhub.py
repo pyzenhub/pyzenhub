@@ -1,41 +1,38 @@
 """Test ZenHub issues API."""
 import pytest
 
-from zenhub import ZenhubError
+from zenhub import Zenhub
+from zenhub.core import DEFAULT_BASE_URL
 
-from .data import REPO_ID
-
-# Constants
-# ----------------------------------------------------------------------------
-RELEASE_REPORT_KEYS = [
-    "release_id",
-    "title",
-    "description",
-    "start_date",
-    "desired_end_date",
-    "created_at",
-    "closed_at",
-    "state",
-    "repositories",
-]
+from .data import TOKEN
 
 
-# --- Issues
-# ----------------------------------------------------------------------------
-def test_get_issue_data(zh):
-    data = zh.get_issue_data(REPO_ID, 1)
-    assert data
-    data = zh.get_issue_data(REPO_ID, 2)
-    assert data
+def test_cloud_api():
+    zh = Zenhub(TOKEN)
+    assert zh._base_url == DEFAULT_BASE_URL
 
 
-def test_get_issue_data_invalid_issue(zh):
-    with pytest.raises(ZenhubError) as excinfo:
-        zh.get_issue_data(REPO_ID, 10000)
+@pytest.mark.parametrize(
+    'enterprise,url,result',
+    [
+        (2, 'https://enterprise.com', 'https://enterprise.com'),
+        (2, 'https://enterprise.com/', 'https://enterprise.com/'),
+        (3, 'https://enterprise.com', 'https://enterprise.com/api'),
+        (3, 'https://enterprise.com/', 'https://enterprise.com/api'),
+    ],
+)
+def test_enterprise_api(enterprise, url, result):
+    zh = Zenhub(TOKEN, base_url=url, enterprise=enterprise)
+    assert zh._base_url == result
 
-    assert "Not found." in excinfo.value.args[0]
 
-
-def test_get_issue_events(zh):
-    data = zh.get_issue_events(REPO_ID, 1)
-    assert len(data) >= 1
+@pytest.mark.parametrize(
+    'enterprise',
+    [
+        (2,),
+        (3,),
+    ],
+)
+def test_enterprise_api_change(enterprise):
+    zh = Zenhub(TOKEN, enterprise=enterprise)
+    assert zh._base_url == DEFAULT_BASE_URL

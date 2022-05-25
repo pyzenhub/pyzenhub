@@ -22,11 +22,11 @@ class MockResponse:
 # ----------------------------------------------------------------------------
 def test_date_to_string():
     date_string = utils.date_to_string(datetime.datetime(2020, 1, 1))
-    assert date_string == "2020-01-01T00:00:00Z"
+    assert date_string == "2020-01-01T00:00:00.000Z"
 
 
 def test_string_to_date():
-    date = utils.string_to_date("2020-01-01T00:00:00Z")
+    date = utils.string_to_date("2020-01-01T00:00:00.000Z")
     assert date == datetime.datetime(2020, 1, 1)
 
 

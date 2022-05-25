@@ -1,10 +1,14 @@
 import datetime
 import random
 
-from .data import REPO_ID, MILESTONE_ID
 from zenhub.utils import date_to_string
 
-DATE = datetime.datetime(2020, 4, 30) - datetime.timedelta(random.randint(20, 90))
+from .data import MILESTONE_ID, REPO_ID
+
+DATE = datetime.datetime(2020, 4, 30) - datetime.timedelta(
+    random.randint(20, 90)
+)
+
 
 def test_set_milestone_start_date(zh):
     data = zh.set_milestone_start_date(REPO_ID, MILESTONE_ID, start_date=DATE)
