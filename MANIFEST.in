@@ -3,3 +3,4 @@ include *.md
 include *.yaml
 recursive-include zenhub *.py
 recursive-exclude tests *.py
+exclude codecov.yml
