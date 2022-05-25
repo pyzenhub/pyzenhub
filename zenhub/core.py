@@ -17,12 +17,12 @@ from .exceptions import (
     NotFoundError,
     ZenhubError,
 )
+from .utils import ISO8601DateString, check_dates, date_to_string
 
 # Types
 # -----------------------------------------------------------------------------
 URLString = str
 Base64String = str
-ISO8601DateString = str
 ReportState = Literal["open", "closed"]
 
 
@@ -98,6 +98,25 @@ class Dependencies(TypedDict):
 
 PatchResponse = Union[AddRemoveIssue, None]
 
+
+class PlusOnes(TypedDict):
+    created_at: ISO8601DateString
+
+
+class Pipeline(TypedDict):
+    name: str
+    pipeline_id: Base64String
+    workspace_id: Base64String
+
+
+class IssueData(TypedDict):
+    estimate: IssueEstimate
+    is_epic: bool
+    plus_ones: List[PlusOnes]
+    pipeline: Pipeline
+    pipelines: List[Pipeline]
+
+
 # Constants
 # -----------------------------------------------------------------------------
 DEFAULT_BASE_URL: URLString = "https://api.zenhub.com"
@@ -158,19 +177,6 @@ class Zenhub:
 
         return contents
 
-    @staticmethod
-    def _check_date(date: datetime.datetime) -> ISO8601DateString:
-        """Check date and transform to valid format."""
-        return date.replace(microsecond=0).isoformat() + "Z"
-
-    @staticmethod
-    def _check_dates(
-        start_date: datetime.datetime, desired_end_date: datetime.datetime
-    ) -> None:
-        """Check ``desired_end_date`` comes after ``start_date``."""
-        if start_date > desired_end_date:
-            raise ValueError("Start date must be before end date.")
-
     def _make_url(self, url: URLString) -> URLString:
         """Create full api url."""
         return f"{self._base_url}{url}"
@@ -202,7 +208,7 @@ class Zenhub:
 
     # --- Issues
     # ------------------------------------------------------------------------
-    def get_issue_data(self, repo_id: int, issue_number: int) -> dict:
+    def get_issue_data(self, repo_id: int, issue_number: int) -> IssueData:
         """
         Get the data for a specific issue.
 
@@ -215,7 +221,7 @@ class Zenhub:
 
         Returns
         -------
-        dict
+        IssueData
 
         Note
         ----
@@ -236,7 +242,7 @@ class Zenhub:
         """
         # GET /p1/repositories/:repo_id/issues/:issue_number
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}"
-        return self._get(url)
+        return self._get(url)  # type: ignore
 
     def get_issue_events(self, repo_id: int, issue_number: int) -> dict:
         """
@@ -550,7 +556,7 @@ class Zenhub:
             f"/p1/repositories/{repo_id}/milestones/"
             f"{milestone_number}/start_date"
         )
-        body = {"start_date": self._check_date(start_date)}
+        body = {"start_date": date_to_string(start_date)}
         return self._post(url, body)  # type: ignore
 
     def get_milestone_start_date(
@@ -589,6 +595,11 @@ class Zenhub:
     def get_dependencies(self, repo_id: int) -> Dependencies:
         """
         Get Dependencies for a Repository.
+
+        Parameters
+        ----------
+        repo_id : int
+            ID of the repository, not its full name.
 
         Note
         ----
@@ -723,13 +734,13 @@ class Zenhub:
         ----
         https://github.com/ZenHubIO/API#create-a-release-report
         """
-        self._check_dates(start_date, desired_end_date)
+        check_dates(start_date, desired_end_date)
         # POST /p1/repositories/:repo_id/reports/release
         url = f"/p1/repositories/{repo_id}/reports/release"
         body = {
             "title": title,
-            "start_date": self._check_date(start_date),
-            "desired_end_date": self._check_date(desired_end_date),
+            "start_date": date_to_string(start_date),
+            "desired_end_date": date_to_string(desired_end_date),
         }
         if description:
             body["description"] = description
@@ -817,14 +828,14 @@ class Zenhub:
         ----
         https://github.com/ZenHubIO/API#edit-a-release-report
         """
-        self._check_dates(start_date, desired_end_date)
+        check_dates(start_date, desired_end_date)
         # PATCH /p1/reports/release/:release_id
         url = f"/p1/reports/release/{release_id}"
         body = {
             "title": title,
             "description": description,
-            "start_date": self._check_date(start_date),
-            "desired_end_date": self._check_date(desired_end_date),
+            "start_date": date_to_string(start_date),
+            "desired_end_date": date_to_string(desired_end_date),
         }
         if state is not None:
             if state in ["open", "closed"]:
@@ -928,10 +939,10 @@ class Zenhub:
             The unique string identifier of the Release Report.
         add_issues : Iterable of Issue
             An iterable of dictionaries with ``repo_id`` and ``issue_number``
-            to add to the Release Report.
+            keys to add to the Release Report.
         remove_issues : Iterable of Issue
             An iterable of dictionaries with ``repo_id`` and ``issue_number``
-            to remove from the Release Report.
+            keys to remove from the Release Report.
 
         Returns
         -------

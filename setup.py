@@ -28,7 +28,7 @@ def get_version(module="zenhub"):
     return version
 
 
-def get_description():
+def get_description() -> str:
     """Get long description."""
     with open(os.path.join(HERE, "README.md")) as f:
         data = f.read()

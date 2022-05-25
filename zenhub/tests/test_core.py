@@ -37,12 +37,7 @@ def zh():
 # ----------------------------------------------------------------------------
 def test_get_issue_data(zh):
     data = zh.get_issue_data(REPO_ID, 1)
-    assert list(data.keys()) == [
-        "plus_ones",
-        "is_epic",
-        "pipelines",
-        "pipeline",
-    ]
+    assert data
 
 
 def test_get_issue_data_invalid_issue(zh):
@@ -51,6 +46,23 @@ def test_get_issue_data_invalid_issue(zh):
 
     assert "Not found." in excinfo.value.args[0]
 
+
+def test_get_issue_events(zh):
+    data = zh.get_issue_events(REPO_ID, 1)
+    assert len(data) >= 1
+
+
+# --- Epics
+# ----------------------------------------------------------------------------
+
+# --- Milestones
+# ----------------------------------------------------------------------------
+
+# --- Workspaces
+# ----------------------------------------------------------------------------
+
+# --- Dependencies
+# ----------------------------------------------------------------------------
 
 # --- Release Report
 # ----------------------------------------------------------------------------
