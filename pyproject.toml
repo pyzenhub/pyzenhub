@@ -1,3 +1,13 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "zenhub/_version.py"
+
+[tool.check-manifest]
+ignore = ["pyzenhub/_version.py"]
+
 [tool.black]
 target-version = ['py38', 'py39', 'py310']
 skip-string-normalization = true

@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 
 .DS_Store
+
+# written by setuptools_scm
+zenhub/_version.py
