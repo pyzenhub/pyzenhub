@@ -63,3 +63,9 @@ jobs:
         env:
           ZENHUB_TEST_TOKEN:  ${{ secrets.ZENHUB_TEST_TOKEN }}
         run: pytest tests --cov=zenhub
+      - uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          name: codecov-umbrella
+          fail_ci_if_error: true
+          verbose: true

@@ -2,6 +2,15 @@
 
 Python bindings to the Zenhub API.
 
+## Project status
+
+[![License](https://img.shields.io/pypi/l/pyzenhub.svg?color=green)](https://github.com/goanpeca/pyzenhub/raw/main/LICENSE.txt)
+[![PyPI](https://img.shields.io/pypi/v/pyzenhub.svg?color=green)](https://pypi.org/project/puzenhub)
+[![Python
+Version](https://img.shields.io/pypi/pyversions/pyzenhub.svg?color=green)](https://python.org)
+[![Test](https://github.com/goanpeca/pyzenhub/workflows/test_pull_request.yml/badge.svg)](https://github.com/goanpeca/pyzenhub/actions/workflows/test_pull_request.yml)
+[![codecov](https://codecov.io/gh/goanpeca/pyzenhub/branch/main/graph/badge.svg?token=dcsjgl1sOi)](https://codecov.io/gh/goanpeca/pyzenhub)
+
 ## Usage
 
 ```python
