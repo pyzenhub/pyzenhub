@@ -1,10 +1,20 @@
-# Contributing to pyzenhub
+# Contributing to this repository
 
-## Usage
+## Clone
 
-```python
-from zenhub import Zenhub
+To get started fork this repository, and clone your fork:
 
-zh = Zenhub(<zenhub_token>)
-zh.get_epics(<repo_id>)
+```bash
+# clone your fork
+git clone https://github.com/<your_organization>/pyzenhub
+cd pyzenhub
+
+# install pre-commit hooks
+pre-commit install
+
+# install in editable mode
+pip install -e .
+
+# run tests & make sure everything is working!
+pytest tests --cov=zenhub --cov-report term-missing
 ```
