@@ -37,7 +37,6 @@ class Zenhub(
         enterprise: int = 2,
     ):
         """ZenHub API wrapper."""
-        print([base_url, enterprise])
         self._session = requests.Session()
         if enterprise == 3 and base_url != DEFAULT_BASE_URL:
             if base_url.endswith("/"):
@@ -45,7 +44,6 @@ class Zenhub(
             else:
                 base_url = base_url + "/api"
 
-        print(base_url)
         self._base_url = base_url
 
         # Setup

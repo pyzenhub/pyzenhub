@@ -3,7 +3,7 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel
 
-from .types import Base64String, ISO8601DateString, IssuePosition
+from .types import Base64String, ISO8601DateString, IssuePosition, URLString
 
 
 class PlusOnes(BaseModel):
@@ -22,6 +22,7 @@ class IssueEstimate(BaseModel):
 
 class IssueData(BaseModel):
     estimate: Optional[IssueEstimate]
+    repo_id: Optional[int]
     is_epic: bool
     plus_ones: List[PlusOnes]
     pipeline: Optional[Pipeline]
@@ -31,6 +32,11 @@ class IssueData(BaseModel):
 class Issue(BaseModel):
     repo_id: int
     issue_number: int
+
+
+class AddRemoveIssuesEpic(BaseModel):
+    added_issues: List[Issue]
+    removed_issues: List[Issue]
 
 
 class AddRemoveIssue(BaseModel):
@@ -89,3 +95,21 @@ class BoardPipeline(BaseModel):
 
 class Board(BaseModel):
     pipelines: List[BoardPipeline]
+
+
+class Epic(BaseModel):
+    issue_number: int
+    repo_id: int
+    issue_url: URLString
+
+
+class Epics(BaseModel):
+    epic_issues: List[Epic]
+
+
+class EpicData(BaseModel):
+    total_epic_estimates: IssueEstimate
+    estimate: Optional[IssueEstimate]
+    pipeline: Pipeline
+    pipelines: List[Pipeline]
+    issues: List[Issue]
