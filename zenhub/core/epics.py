@@ -219,13 +219,38 @@ class EpicsMixin(BaseMixin):
 
         The result returns which issue was added or removed from the Epic.
 
-        remove_issues	[{repo_id: Number, issue_number: Number}]
-        add_issues	[{repo_id: Number, issue_number: Number}]
+        Parameters
+        ----------
+        repo_id : int
+            ID of the repository, not its full name.
+        issue_number : int
+            The number of the epic.
+        remove_issues: Iterable[Issue]
+            Issues to remove from epic.
+        add_issues: Iterable[Issue]
+            Issues to add to epic.
+
+        Returns
+        -------
+        dict
+            Example response.
+
+        .. code-block:: python
+            {
+                "removed_issues": [
+                    {"repo_id": 3887883, "issue_number": 3}
+                ],
+                "added_issues": [
+                    {"repo_id": 3887883, "issue_number": 2},
+                    {"repo_id": 3887883, "issue_number": 1}
+                ]
+            }
 
         Note
         ----
         https://github.com/ZenHubIO/API#add-or-remove-issues-to-epic
         """
+        # POST /p1/repositories/:repo_id/epics/:issue_number/update_issues
         url = f"/p1/repositories/{repo_id}/epics/{issue_number}/update_issues"
         body = {
             "remove_issues": list(remove_issues),

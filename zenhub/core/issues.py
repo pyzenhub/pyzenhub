@@ -238,7 +238,7 @@ class IssuesMixin(BaseMixin):
 
     def set_issue_estimate(
         self, repo_id: int, issue_number: int, estimate: int
-    ) -> Estimate:
+    ) -> dict:
         """
         Set Issue Estimate.
 
@@ -253,7 +253,7 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        Estimate. See example response below.
+        Dict. See example response below.
 
         .. code-block:: python
             {
@@ -267,4 +267,5 @@ class IssuesMixin(BaseMixin):
         # PUT /p1/repositories/:repo_id/issues/:issue_number/estimate
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/estimate"
         body = {"estimate": estimate}
-        return self._put(url, body)  # type: ignore
+        data = self._put(url, body)
+        return Estimate.parse_obj(data).dict(include=data.keys())

@@ -1,4 +1,6 @@
 """Test ZenHub issues API."""
+import random
+
 import pytest
 
 from zenhub import ZenhubError
@@ -23,3 +25,9 @@ def test_get_issue_data_invalid_issue(zh):
 def test_get_issue_events(zh):
     data = zh.get_issue_events(REPO_ID, 1)
     assert len(data) >= 1
+
+
+def test_set_issue_estimate(zh):
+    estimate = random.randint(1, 10)
+    data = zh.set_issue_estimate(REPO_ID, 1, estimate=estimate)
+    assert data["estimate"] == estimate

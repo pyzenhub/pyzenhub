@@ -1,10 +1,10 @@
 """ZenHub dependencies methods."""
-from ..models import Dependencies
+from ..models import Dependencies, Dependency
 from .base import BaseMixin
 
 
 class DependenciesMixin(BaseMixin):
-    def get_dependencies(self, repo_id: int) -> Dependencies:
+    def get_dependencies(self, repo_id: int) -> dict:
         """
         Get Dependencies for a Repository.
 
@@ -13,13 +13,45 @@ class DependenciesMixin(BaseMixin):
         repo_id : int
             ID of the repository, not its full name.
 
+        Returns
+        -------
+        dict
+            Dictionary of dependencies. See example below.
+
+        .. code-block:: python
+            {
+                "dependencies": [
+                    {
+                        "blocking": {
+                            "issue_number": 3953,
+                            "repo_id": 1234567
+                        },
+                        "blocked": {
+                            "issue_number": 1342,
+                            "repo_id": 1234567
+                        }
+                    },
+                    {
+                        "blocking": {
+                            "issue_number": 5,
+                            "repo_id": 987
+                        },
+                        "blocked": {
+                            "issue_number": 1342,
+                            "repo_id": 1234567
+                        }
+                    }
+                ]
+            }
+
         Note
         ----
         https://github.com/ZenHubIO/API#get-dependencies-for-a-repository
         """
         # GET /p1/repositories/:repo_id/dependencies
         url = f"/p1/repositories/{repo_id}/dependencies"
-        return self._get(url)  # type: ignore
+        data = self._get(url)
+        return Dependencies.parse_obj(data).dict(include=data.keys())
 
     def create_dependency(
         self,
@@ -44,7 +76,20 @@ class DependenciesMixin(BaseMixin):
 
         Returns
         -------
-        Empty dictionary on success.
+        dict
+            Example response.
+
+        .. code-block:: python
+            {
+                "blocking": {
+                    "repo_id": 92563409,
+                    "issue_number": 14
+                },
+                "blocked": {
+                    "repo_id": 92563409,
+                    "issue_number": 13
+                }
+            }
 
         Note
         ----
@@ -62,7 +107,8 @@ class DependenciesMixin(BaseMixin):
                 "issue_number": blocked_issue_number,
             },
         }
-        return self._post(url, body)
+        data = self._post(url, body)
+        return Dependency.parse_obj(data).dict(include=data.keys())
 
     def remove_dependency(
         self,
@@ -70,7 +116,7 @@ class DependenciesMixin(BaseMixin):
         blocking_issue_number: int,
         blocked_repo_id: int,
         blocked_issue_number: int,
-    ) -> dict:
+    ) -> bool:
         """
         Remove a dependency.
 
@@ -87,7 +133,8 @@ class DependenciesMixin(BaseMixin):
 
         Returns
         -------
-        Empty dictionary on success.
+        bool
+            ``True`` if the dependency was removed.
 
         Note
         ----
@@ -105,4 +152,4 @@ class DependenciesMixin(BaseMixin):
                 "issue_number": blocked_issue_number,
             },
         }
-        return self._delete(url, body)
+        return True if self._delete(url, body) == {} else False
