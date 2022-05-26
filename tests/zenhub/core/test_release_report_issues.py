@@ -8,6 +8,7 @@ from .data import RELEASE_REPORT, REPO_ID
 def test_get_release_report_issues(zh):
     data = zh.get_release_report_issues(RELEASE_REPORT)
     assert isinstance(data, list)
+    assert data
 
 
 def test_get_release_report_issues_invalid(zh):

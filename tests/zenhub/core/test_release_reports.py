@@ -31,7 +31,7 @@ def test_create_release_report(zh):
         start_date=datetime.datetime.now(),
         desired_end_date=datetime.datetime.now() + datetime.timedelta(days=60),
         description=description,
-        repositories=[],
+        repositories=[REPO_ID],
     )
     assert list(data.keys()) == RELEASE_REPORT_KEYS
     assert data["title"] == title

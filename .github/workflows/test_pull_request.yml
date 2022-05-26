@@ -65,7 +65,7 @@ jobs:
       - name: Run pytest
         env:
           ZENHUB_TEST_TOKEN:  ${{ secrets.ZENHUB_TEST_TOKEN }}
-        run: pytest tests --cov=zenhub
+        run: pytest tests --cov=zenhub --cov-report term-missing
       - uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos

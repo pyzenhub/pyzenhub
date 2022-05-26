@@ -84,5 +84,5 @@ class ReleaseReportIssuesMixin(BaseMixin):
             'add_issues': list(add_issues),
             'remove_issues': list(remove_issues),
         }
-        data = self._patch(url, body)
+        data = self._patch(url, body=body)
         return AddRemoveIssue.parse_obj(data).dict(include=data.keys())
