@@ -39,6 +39,7 @@ class MilestonesMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#set-milestone-start-date
         """
+        self._repo_id = repo_id
         # POST /p1/repositories/:repo_id/milestones/:milestone_number/start_date
         url = (
             f"/p1/repositories/{repo_id}/milestones/"
@@ -77,6 +78,7 @@ class MilestonesMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#get-milestone-start-date
         """
+        self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/milestones/:milestone_number/start_date
         url = (
             f"/p1/repositories/{repo_id}/milestones/"

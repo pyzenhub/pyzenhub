@@ -3,7 +3,13 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel
 
-from .types import Base64String, ISO8601DateString, IssuePosition, URLString
+from .types import (
+    Base64String,
+    ISO8601DateString,
+    IssuePosition,
+    Seconds,
+    URLString,
+)
 
 
 class PlusOnes(BaseModel):
@@ -113,3 +119,9 @@ class EpicData(BaseModel):
     pipeline: Pipeline
     pipelines: List[Pipeline]
     issues: List[Issue]
+
+
+class RateLimit(BaseModel):
+    limit: int
+    used: int
+    reset: Seconds

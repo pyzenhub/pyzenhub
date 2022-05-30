@@ -46,6 +46,7 @@ class EpicsMixin(BaseMixin):
           array.
         https://github.com/ZenHubIO/API#get-epics-for-a-repository
         """
+        self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/epics
         url = f"/p1/repositories/{repo_id}/epics"
         data = self._get(url)
@@ -142,6 +143,7 @@ class EpicsMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#get-epic-data
         """
+        self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/epics/:epic_id
         url = f"/p1/repositories/{repo_id}/epics/{epic_id}"
         data = self._get(url)
@@ -167,6 +169,7 @@ class EpicsMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#convert-an-epic-to-an-issue
         """
+        self._repo_id = repo_id
         # POST /p1/repositories/:repo_id/epics/:issue_number/convert_to_issue
         url = (
             f"/p1/repositories/{repo_id}/epics/{issue_number}/convert_to_issue"
@@ -199,6 +202,7 @@ class EpicsMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#convert-issue-to-epic
         """
+        self._repo_id = repo_id
         # POST /p1/repositories/:repo_id/issues/:issue_number/convert_to_epic
         url = (
             f"/p1/repositories/{repo_id}/issues/{issue_number}/convert_to_epic"
@@ -250,6 +254,7 @@ class EpicsMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#add-or-remove-issues-to-epic
         """
+        self._repo_id = repo_id
         # POST /p1/repositories/:repo_id/epics/:issue_number/update_issues
         url = f"/p1/repositories/{repo_id}/epics/{issue_number}/update_issues"
         body = {

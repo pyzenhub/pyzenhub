@@ -70,6 +70,7 @@ class IssuesMixin(BaseMixin):
 
         https://github.com/ZenHubIO/API#get-issue-data
         """
+        self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/issues/:issue_number
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}"
         data = self._get(url)
@@ -154,6 +155,7 @@ class IssuesMixin(BaseMixin):
 
         https://github.com/ZenHubIO/API#get-issue-events
         """
+        self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/issues/:issue_number/events
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/events"
         return self._get(url)
@@ -192,6 +194,7 @@ class IssuesMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#move-an-issue-between-pipelines
         """
+        self._repo_id = repo_id
         # POST /p2/workspaces/:workspace_id/repositories/:repo_id/issues/:issue_number/moves
         url = (
             f"/p2/workspaces/{workspace_id}/repositories/"
@@ -231,6 +234,7 @@ class IssuesMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#move-an-issue-between-pipelines-in-the-oldest-workspace
         """
+        self._repo_id = repo_id
         # POST /p1/repositories/:repo_id/issues/:issue_number/moves
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/moves"
         body = {"pipeline_id": pipeline_id, "position": position}
@@ -264,6 +268,7 @@ class IssuesMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#set-issue-estimate
         """
+        self._repo_id = repo_id
         # PUT /p1/repositories/:repo_id/issues/:issue_number/estimate
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/estimate"
         body = {"estimate": estimate}

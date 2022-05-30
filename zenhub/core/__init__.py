@@ -1,4 +1,6 @@
 """ZenHub API."""
+from typing import Optional
+
 import requests
 
 from ..types import URLString
@@ -6,6 +8,7 @@ from .dependencies import DependenciesMixin
 from .epics import EpicsMixin
 from .issues import IssuesMixin
 from .milestones import MilestonesMixin
+from .rate import RateMixin
 from .release_report_issues import ReleaseReportIssuesMixin
 from .release_reports import ReleaseReportsMixin
 from .workspaces import WorkspacesMixin
@@ -22,6 +25,7 @@ class Zenhub(
     DependenciesMixin,
     ReleaseReportsMixin,
     ReleaseReportIssuesMixin,
+    RateMixin,
 ):
     """Zenhub API wrapper."""
 
@@ -38,6 +42,11 @@ class Zenhub(
     ):
         """ZenHub API wrapper."""
         self._session = requests.Session()
+        self._repo_id: Optional[int] = None
+
+        if base_url == DEFAULT_BASE_URL:
+            self._repo_id = 262640661  # Use ZenHub's default repo ID
+
         if enterprise == 3 and base_url != DEFAULT_BASE_URL:
             if base_url.endswith("/"):
                 base_url = base_url + "api"

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import requests
 
 from ..types import URLString
@@ -7,6 +9,7 @@ from ..utils import parse_response_contents
 class BaseMixin:
     _session: requests.Session
     _base_url: URLString
+    _repo_id: Optional[int]
 
     def _make_url(self, url: URLString) -> URLString:
         """Create full api url."""
