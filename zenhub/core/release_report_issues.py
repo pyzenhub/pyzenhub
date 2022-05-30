@@ -1,6 +1,6 @@
 """ZenHub release report issues methods."""
 
-from typing import Iterable, List
+from typing import Iterable, List, Union
 
 from ..models import AddRemoveIssue, Issue
 from ..types import Base64String
@@ -10,7 +10,7 @@ from .base import BaseMixin
 class ReleaseReportIssuesMixin(BaseMixin):
     def get_release_report_issues(
         self, release_id: Base64String
-    ) -> List[dict]:
+    ) -> Union[List[Issue], List[dict]]:
         """
         Get all the Issues for a Release Report.
 
@@ -21,7 +21,8 @@ class ReleaseReportIssuesMixin(BaseMixin):
 
         Returns
         -------
-        List of dictionaries. See example response below.
+        List of Issue or List of dictionaries
+            See example response below.
 
         .. code-block:: python
             [
@@ -35,17 +36,20 @@ class ReleaseReportIssuesMixin(BaseMixin):
         """
         # GET /p1/reports/release/:release_id/issues
         url = f"/p1/reports/release/{release_id}/issues"
-        return [
-            Issue.parse_obj(item).dict(include=item.keys())
-            for item in self._get(url)
-        ]
+        if self._output_models:
+            return [Issue.parse_obj(item) for item in self._get(url)]
+        else:
+            return [
+                Issue.parse_obj(item).dict(include=item.keys())
+                for item in self._get(url)
+            ]
 
     def add_or_remove_issues_from_release_report(
         self,
         release_id: Base64String,
         add_issues: Iterable[Issue] = (),
         remove_issues: Iterable[Issue] = (),
-    ) -> dict:
+    ) -> Union[AddRemoveIssue, dict]:
         """
         Add or Remove Issues to or from a Release Report.
 
@@ -65,7 +69,7 @@ class ReleaseReportIssuesMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        AddRemoveIssue or dict
             The added or removed issues. See example response below.
 
         .. code-block:: python
@@ -85,4 +89,7 @@ class ReleaseReportIssuesMixin(BaseMixin):
             'remove_issues': list(remove_issues),
         }
         data = self._patch(url, body=body)
-        return AddRemoveIssue.parse_obj(data).dict(include=data.keys())
+        model = AddRemoveIssue.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )

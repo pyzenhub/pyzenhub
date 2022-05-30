@@ -7,7 +7,9 @@ from .base import BaseMixin
 
 
 class IssuesMixin(BaseMixin):
-    def get_issue_data(self, repo_id: int, issue_number: int) -> dict:
+    def get_issue_data(
+        self, repo_id: int, issue_number: int
+    ) -> Union[IssueData, dict]:
         """
         Get the data for a specific issue.
 
@@ -20,7 +22,7 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        IssueData or dict
             The issue data dictionary. See example response below.
 
         .. code-block:: python
@@ -74,7 +76,10 @@ class IssuesMixin(BaseMixin):
         # GET /p1/repositories/:repo_id/issues/:issue_number
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}"
         data = self._get(url)
-        return IssueData.parse_obj(data).dict(include=data.keys())
+        model = IssueData.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )
 
     def get_issue_events(self, repo_id: int, issue_number: int) -> dict:
         """
@@ -188,7 +193,8 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        ``True`` if successful.
+        bool
+            ``True`` if successful.
 
         Note
         ----
@@ -228,7 +234,8 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        ``True`` if successful.
+        bool
+            ``True`` if successful.
 
         Note
         ----
@@ -242,7 +249,7 @@ class IssuesMixin(BaseMixin):
 
     def set_issue_estimate(
         self, repo_id: int, issue_number: int, estimate: int
-    ) -> dict:
+    ) -> Union[Estimate, dict]:
         """
         Set Issue Estimate.
 
@@ -257,7 +264,8 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        Dict. See example response below.
+        Estimate or dict.
+            See example response below.
 
         .. code-block:: python
             {
@@ -273,4 +281,12 @@ class IssuesMixin(BaseMixin):
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/estimate"
         body = {"estimate": estimate}
         data = self._put(url, body)
-        return Estimate.parse_obj(data).dict(include=data.keys())
+        model = Estimate.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )
+
+
+'''
+{'pipelines': [{'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNTQ', 'name': 'New Issues', 'issues': [{'issue_number': 11, 'position': 0, 'is_epic': False}, {'issue_number': 13, 'position': 1, 'is_epic': True}, {'issue_number': 14, 'position': 2, 'is_epic': True}, {'issue_number': 16, 'position': 3, 'is_epic': False}]}, {'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNTU', 'name': 'Epics', 'issues': []}, {'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNTY', 'name': 'Icebox', 'issues': []}, {'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNTc', 'name': 'Product Backlog', 'issues': []}, {'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNTg', 'name': 'Sprint Backlog', 'issues': []}, {'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNTk', 'name': 'In Progress', 'issues': []}, {'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNjA', 'name': 'Review/QA', 'issues': []}, {'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNjE', 'name': 'Done', 'issues': []}]}
+'''

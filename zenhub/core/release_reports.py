@@ -1,6 +1,6 @@
 """ZenHub release reports methods."""
 import datetime
-from typing import Iterable, List, Optional
+from typing import Iterable, List, Optional, Union
 
 from ..models import ReleaseReport
 from ..types import Base64String, ReportState
@@ -17,7 +17,7 @@ class ReleaseReportsMixin(BaseMixin):
         desired_end_date: datetime.datetime,
         description: str = "",
         repositories: Iterable[int] = (),
-    ) -> dict:
+    ) -> Union[ReleaseReport, dict]:
         """
         Create a Release Report.
 
@@ -39,7 +39,7 @@ class ReleaseReportsMixin(BaseMixin):
 
         Returns
         -------
-        ReleaseReportWithRepositories
+        ReleaseReport or dict
             The created Release Report. See example response below.
 
         .. code-block:: python
@@ -75,9 +75,14 @@ class ReleaseReportsMixin(BaseMixin):
             body["repositories"] = list(repositories)  # type: ignore [assignment]
 
         data = self._post(url, body)
-        return ReleaseReport.parse_obj(data).dict(include=data.keys())
+        model = ReleaseReport.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )
 
-    def get_release_report(self, release_id: Base64String) -> dict:
+    def get_release_report(
+        self, release_id: Base64String
+    ) -> Union[ReleaseReport, dict]:
         """
         Get a Release Report.
 
@@ -88,7 +93,7 @@ class ReleaseReportsMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        ReleaseReport or dict
             The requested Release Report. See example response below.
 
         .. code-block:: python
@@ -110,9 +115,14 @@ class ReleaseReportsMixin(BaseMixin):
         # GET /p1/reports/release/:release_id
         url = f"/p1/reports/release/{release_id}"
         data = self._get(url)
-        return ReleaseReport.parse_obj(data).dict(include=data.keys())
+        model = ReleaseReport.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )
 
-    def get_release_reports(self, repo_id: int) -> List[dict]:
+    def get_release_reports(
+        self, repo_id: int
+    ) -> Union[List[ReleaseReport], List[dict]]:
         """
         Get Release Reports for a Repository.
 
@@ -123,7 +133,7 @@ class ReleaseReportsMixin(BaseMixin):
 
         Returns
         -------
-        List of dictionaries. See example response below.
+        List of ReleaseReport or List of dict. See example response below.
 
         .. code-block:: python
             [
@@ -156,11 +166,13 @@ class ReleaseReportsMixin(BaseMixin):
         self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/reports/releases
         url = f"/p1/repositories/{repo_id}/reports/releases"
-        data = [
-            ReleaseReport.parse_obj(item).dict(include=item.keys())
-            for item in self._get(url)
-        ]
-        return data
+        if self._output_models:
+            return [ReleaseReport.parse_obj(item) for item in self._get(url)]
+        else:
+            return [
+                ReleaseReport.parse_obj(item).dict(include=item.keys())
+                for item in self._get(url)
+            ]
 
     def edit_release_report(
         self,
@@ -170,7 +182,7 @@ class ReleaseReportsMixin(BaseMixin):
         desired_end_date: datetime.datetime,
         description: str = '',
         state: Optional[ReportState] = None,
-    ) -> dict:
+    ) -> Union[ReleaseReport, dict]:
         """
         Edit a Release Report.
 
@@ -191,7 +203,7 @@ class ReleaseReportsMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        ReleaseReport or dict
             The created Release Report. See example response below.
 
         .. code-block:: python
@@ -227,7 +239,10 @@ class ReleaseReportsMixin(BaseMixin):
                 raise ValueError("`state` must be 'open' or 'closed'")
 
         data = self._patch(url, body)
-        return ReleaseReport.parse_obj(data).dict(include=data.keys())
+        model = ReleaseReport.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )
 
     def add_repo_to_release_report(
         self, release_id: Base64String, repo_id: int
@@ -244,7 +259,8 @@ class ReleaseReportsMixin(BaseMixin):
 
         Returns
         -------
-        ``True`` if successful.
+        bool
+            ``True`` if successful.
 
         Note
         ----
@@ -270,7 +286,8 @@ class ReleaseReportsMixin(BaseMixin):
 
         Returns
         -------
-        ``True`` if successful.
+        bool
+            ``True`` if successful.
 
         Note
         ----

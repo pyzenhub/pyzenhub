@@ -1,10 +1,12 @@
 """ZenHub dependencies methods."""
+from typing import Union
+
 from ..models import Dependencies, Dependency
 from .base import BaseMixin
 
 
 class DependenciesMixin(BaseMixin):
-    def get_dependencies(self, repo_id: int) -> dict:
+    def get_dependencies(self, repo_id: int) -> Union[Dependencies, dict]:
         """
         Get Dependencies for a Repository.
 
@@ -15,7 +17,7 @@ class DependenciesMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        Dependencies or dict
             Dictionary of dependencies. See example below.
 
         .. code-block:: python
@@ -52,7 +54,10 @@ class DependenciesMixin(BaseMixin):
         # GET /p1/repositories/:repo_id/dependencies
         url = f"/p1/repositories/{repo_id}/dependencies"
         data = self._get(url)
-        return Dependencies.parse_obj(data).dict(include=data.keys())
+        model = Dependencies.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )
 
     def create_dependency(
         self,
@@ -60,7 +65,7 @@ class DependenciesMixin(BaseMixin):
         blocking_issue_number: int,
         blocked_repo_id: int,
         blocked_issue_number: int,
-    ) -> dict:
+    ) -> Union[Dependency, dict]:
         """
         Create a dependency.
 
@@ -77,7 +82,7 @@ class DependenciesMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        Dependency or dict
             Example response.
 
         .. code-block:: python
@@ -110,7 +115,10 @@ class DependenciesMixin(BaseMixin):
             },
         }
         data = self._post(url, body)
-        return Dependency.parse_obj(data).dict(include=data.keys())
+        model = Dependency.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )
 
     def remove_dependency(
         self,

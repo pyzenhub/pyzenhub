@@ -39,6 +39,7 @@ class Zenhub(
         token: str,
         base_url: URLString = DEFAULT_BASE_URL,
         enterprise: int = 2,
+        return_models: bool = False,
     ):
         """ZenHub API wrapper."""
         self._session = requests.Session()
@@ -54,6 +55,7 @@ class Zenhub(
                 base_url = base_url + "/api"
 
         self._base_url = base_url
+        self._output_models = return_models
 
         # Setup
         self._session.headers.update(self._HEADERS)

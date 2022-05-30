@@ -10,6 +10,7 @@ class BaseMixin:
     _session: requests.Session
     _base_url: URLString
     _repo_id: Optional[int]
+    _output_models: bool
 
     def _make_url(self, url: URLString) -> URLString:
         """Create full api url."""
