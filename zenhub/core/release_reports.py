@@ -2,7 +2,7 @@
 import datetime
 from typing import Iterable, List, Optional
 
-from ..models import AddRemoveIssue, Issue, ReleaseReport
+from ..models import ReleaseReport
 from ..types import Base64String, ReportState
 from ..utils import check_dates, date_to_string
 from .base import BaseMixin
