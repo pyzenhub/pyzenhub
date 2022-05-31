@@ -6,3 +6,4 @@ Base64String = str
 ReportState = Literal["open", "closed"]
 IssuePosition = Literal["top", "bottom"]
 ISO8601DateString = str
+Seconds = int

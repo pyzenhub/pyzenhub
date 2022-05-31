@@ -48,6 +48,7 @@ class DependenciesMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#get-dependencies-for-a-repository
         """
+        self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/dependencies
         url = f"/p1/repositories/{repo_id}/dependencies"
         data = self._get(url)
@@ -95,6 +96,7 @@ class DependenciesMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#create-a-dependency
         """
+        self._repo_id = blocked_repo_id
         # POST /p1/dependencies
         url = "/p1/dependencies"
         body = {
@@ -140,6 +142,7 @@ class DependenciesMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#remove-a-dependency
         """
+        self._repo_id = blocked_repo_id
         # DELETE /p1/dependencies
         url = "/p1/dependencies"
         body = {

@@ -41,6 +41,7 @@ class WorkspacesMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#get-zenhub-workspaces-for-a-repository
         """
+        self._repo_id = repo_id
         # GET /p2/repositories/:repo_id/workspaces
         url = f"/p2/repositories/{repo_id}/workspaces"
         data = self._get(url)
@@ -130,6 +131,7 @@ class WorkspacesMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#get-a-zenhub-board-for-a-repository
         """
+        self._repo_id = repo_id
         # GET /p2/workspaces/:workspace_id/repositories/:repo_id/board
         url = f"/p2/workspaces/{workspace_id}/repositories/{repo_id}/board"
         data = self._get(url)
@@ -213,6 +215,7 @@ class WorkspacesMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#get-the-oldest-zenhub-board-for-a-repository
         """
+        self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/board
         url = f"/p1/repositories/{repo_id}/board"
         data = self._get(url)

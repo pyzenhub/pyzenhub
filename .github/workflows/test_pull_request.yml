@@ -6,9 +6,6 @@ on:
       - main
     tags:
       - "v*"
-  pull_request:
-    branches:
-      - main
   pull_request_target:
     branches:
       - main
@@ -65,7 +62,7 @@ jobs:
       - name: Run pytest
         env:
           ZENHUB_TEST_TOKEN:  ${{ secrets.ZENHUB_TEST_TOKEN }}
-        run: pytest tests --cov=zenhub --cov-report term-missing
+        run: pytest tests --cov=zenhub --cov=tests --cov-report term-missing:skip-covered
       - uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos

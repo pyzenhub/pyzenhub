@@ -59,6 +59,7 @@ class ReleaseReportsMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#create-a-release-report
         """
+        self._repo_id = repo_id
         check_dates(start_date, desired_end_date)
         # POST /p1/repositories/:repo_id/reports/release
         url = f"/p1/repositories/{repo_id}/reports/release"
@@ -152,6 +153,7 @@ class ReleaseReportsMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#get-release-reports-for-a-repository
         """
+        self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/reports/releases
         url = f"/p1/repositories/{repo_id}/reports/releases"
         data = [
@@ -248,6 +250,7 @@ class ReleaseReportsMixin(BaseMixin):
         ----
         https://github.com/ZenHubIO/API#add-a-repository-to-a-release-report
         """
+        self._repo_id = repo_id
         # POST /p1/reports/release/:release_id/repository/:repo_id
         url = f"/p1/reports/release/{release_id}/repository/{repo_id}"
         return True if self._post(url) == {} else False
@@ -274,6 +277,7 @@ class ReleaseReportsMixin(BaseMixin):
         A release must always have at least one repository.
         https://github.com/ZenHubIO/API#remove-a-repository-from-a-release-report
         """
+        self._repo_id = repo_id
         # DELETE /p1/reports/release/:release_id/repository/:repo_id
         url = f"/p1/reports/release/{release_id}/repository/{repo_id}"
         return True if self._delete(url) == {} else False
