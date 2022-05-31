@@ -1,5 +1,6 @@
 """ZenHub milestone methods."""
 import datetime
+from typing import Union
 
 from ..models import MilestoneDate
 from ..utils import date_to_string
@@ -12,7 +13,7 @@ class MilestonesMixin(BaseMixin):
         repo_id: int,
         milestone_number: int,
         start_date: datetime.datetime,
-    ) -> dict:
+    ) -> Union[MilestoneDate, dict]:
         """
         Set milestone start date.
 
@@ -27,7 +28,7 @@ class MilestonesMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        MilestoneDate or dict
             The milestone with the new start date. See example below.
 
         .. code-block:: python
@@ -47,11 +48,14 @@ class MilestonesMixin(BaseMixin):
         )
         body = {"start_date": date_to_string(start_date)}
         data = self._post(url, body)
-        return MilestoneDate.parse_obj(data).dict(include=data.keys())
+        model = MilestoneDate.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )
 
     def get_milestone_start_date(
         self, repo_id: int, milestone_number: int
-    ) -> dict:
+    ) -> Union[MilestoneDate, dict]:
         """
         Get milestone start date.
 
@@ -66,7 +70,7 @@ class MilestonesMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        MilestoneDate or dict
             The milestone with the current start date. See example below.
 
         .. code-block:: python
@@ -85,4 +89,7 @@ class MilestonesMixin(BaseMixin):
             f"{milestone_number}/start_date"
         )
         data = self._get(url)
-        return MilestoneDate.parse_obj(data).dict(include=data.keys())
+        model = MilestoneDate.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )

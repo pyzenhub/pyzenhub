@@ -1,5 +1,5 @@
 """ZenHub workspace methods."""
-from typing import List
+from typing import List, Union
 
 from ..models import Board, Workspace
 from ..types import Base64String
@@ -7,7 +7,9 @@ from .base import BaseMixin
 
 
 class WorkspacesMixin(BaseMixin):
-    def get_workspaces(self, repo_id: int) -> List[dict]:
+    def get_workspaces(
+        self, repo_id: int
+    ) -> Union[List[dict], List[Workspace]]:
         """
         Gets all Workspaces containing ``repo_id``.
 
@@ -45,14 +47,17 @@ class WorkspacesMixin(BaseMixin):
         # GET /p2/repositories/:repo_id/workspaces
         url = f"/p2/repositories/{repo_id}/workspaces"
         data = self._get(url)
-        return [
-            Workspace.parse_obj(workspace).dict(include=workspace.keys())
-            for workspace in data
-        ]
+        if self._output_models:
+            return [Workspace.parse_obj(workspace) for workspace in data]
+        else:
+            return [
+                Workspace.parse_obj(workspace).dict(include=workspace.keys())
+                for workspace in data
+            ]
 
     def get_repository_board(
         self, workspace_id: Base64String, repo_id: int
-    ) -> dict:
+    ) -> Union[dict, Board]:
         """
         Get ZenHub Board data for a repository (``repo_id``) within the
         Workspace (``workspace_id``).
@@ -66,7 +71,7 @@ class WorkspacesMixin(BaseMixin):
 
         Returns
         -------
-        Dictionary with board information.
+        Dictionary or model with board information.
             Zenhub workspace board listing pipelines and issues. See example
             response below.
 
@@ -135,11 +140,14 @@ class WorkspacesMixin(BaseMixin):
         # GET /p2/workspaces/:workspace_id/repositories/:repo_id/board
         url = f"/p2/workspaces/{workspace_id}/repositories/{repo_id}/board"
         data = self._get(url)
-        return Board.parse_obj(data).dict(
-            include=data.keys(), exclude_none=True
+        model = Board.parse_obj(data)
+        return (
+            model
+            if self._output_models
+            else model.dict(include=data.keys(), exclude_none=True)
         )
 
-    def get_oldest_repository_board(self, repo_id: int) -> dict:
+    def get_oldest_repository_board(self, repo_id: int) -> Union[dict, Board]:
         """
         Get the oldest ZenHub board for a repository.
 
@@ -150,7 +158,7 @@ class WorkspacesMixin(BaseMixin):
 
         Returns
         -------
-        Dictionary with board information.
+        Dictionary or model with board information.
             Zenhub workspace board listing pipelines and issues. See example
             response below.
 
@@ -219,6 +227,9 @@ class WorkspacesMixin(BaseMixin):
         # GET /p1/repositories/:repo_id/board
         url = f"/p1/repositories/{repo_id}/board"
         data = self._get(url)
-        return Board.parse_obj(data).dict(
-            include=data.keys(), exclude_none=True
+        model = Board.parse_obj(data)
+        return (
+            model
+            if self._output_models
+            else model.dict(include=data.keys(), exclude_none=True)
         )

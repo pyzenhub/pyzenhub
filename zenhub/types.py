@@ -7,3 +7,4 @@ ReportState = Literal["open", "closed"]
 IssuePosition = Literal["top", "bottom"]
 ISO8601DateString = str
 Seconds = int
+IssueEventType = Literal['estimateIssue', 'transferIssue']

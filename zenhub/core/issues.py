@@ -1,13 +1,21 @@
 """ZenHub issues methods."""
-from typing import Union
+from typing import List, Optional, Union
 
-from ..models import Estimate, IssueData
+from ..models import (
+    Estimate,
+    EstimateIssueEvent,
+    Event,
+    IssueData,
+    TransferIssueEvent,
+)
 from ..types import Base64String, IssuePosition
 from .base import BaseMixin
 
 
 class IssuesMixin(BaseMixin):
-    def get_issue_data(self, repo_id: int, issue_number: int) -> dict:
+    def get_issue_data(
+        self, repo_id: int, issue_number: int
+    ) -> Union[IssueData, dict]:
         """
         Get the data for a specific issue.
 
@@ -20,7 +28,7 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        IssueData or dict
             The issue data dictionary. See example response below.
 
         .. code-block:: python
@@ -74,9 +82,14 @@ class IssuesMixin(BaseMixin):
         # GET /p1/repositories/:repo_id/issues/:issue_number
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}"
         data = self._get(url)
-        return IssueData.parse_obj(data).dict(include=data.keys())
+        model = IssueData.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )
 
-    def get_issue_events(self, repo_id: int, issue_number: int) -> dict:
+    def get_issue_events(
+        self, repo_id: int, issue_number: int
+    ) -> Union[List[Event], List[dict]]:
         """
         Get the events for an issue.
 
@@ -89,7 +102,7 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        List of Event or List of dict
             See example response below.
 
         .. code-block:: python
@@ -158,7 +171,19 @@ class IssuesMixin(BaseMixin):
         self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/issues/:issue_number/events
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/events"
-        return self._get(url)
+        events: List[dict] = self._get(url)  # type: ignore
+        event_models: List[Event] = []
+        for event in events:
+            event_model: Optional[Event] = None
+            if event["type"] == "estimateIssue":
+                event_model = EstimateIssueEvent.parse_obj(event)
+            elif event["type"] == "transferIssue":
+                event_model = TransferIssueEvent.parse_obj(event)
+
+            if event_model:
+                event_models.append(event_model)
+
+        return event_models if self._output_models else events
 
     def move_issue(
         self,
@@ -188,7 +213,8 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        ``True`` if successful.
+        bool
+            ``True`` if successful.
 
         Note
         ----
@@ -228,7 +254,8 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        ``True`` if successful.
+        bool
+            ``True`` if successful.
 
         Note
         ----
@@ -242,7 +269,7 @@ class IssuesMixin(BaseMixin):
 
     def set_issue_estimate(
         self, repo_id: int, issue_number: int, estimate: int
-    ) -> dict:
+    ) -> Union[Estimate, dict]:
         """
         Set Issue Estimate.
 
@@ -257,7 +284,8 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        Dict. See example response below.
+        Estimate or dict.
+            See example response below.
 
         .. code-block:: python
             {
@@ -273,4 +301,7 @@ class IssuesMixin(BaseMixin):
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/estimate"
         body = {"estimate": estimate}
         data = self._put(url, body)
-        return Estimate.parse_obj(data).dict(include=data.keys())
+        model = Estimate.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )

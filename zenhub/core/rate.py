@@ -1,6 +1,6 @@
 """ZenHub dependencies methods."""
 import datetime
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 from requests.structures import CaseInsensitiveDict
 
@@ -32,7 +32,9 @@ class RateMixin(BaseMixin):
         response = self._session.head(url=self._make_url(url))
         return response.headers
 
-    def rate_limit(self, repo_id: Optional[int] = None) -> Dict[str, int]:
+    def rate_limit(
+        self, repo_id: Optional[int] = None
+    ) -> Union[RateLimit, Dict[str, int]]:
         """API rate limit.
 
         A maximum of 100 requests per minute to the API.
@@ -44,7 +46,7 @@ class RateMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        dict or RateLimit
             Dictionary with rate limit, available calls and time to reset
             limits in seconds.
 
@@ -92,4 +94,4 @@ class RateMixin(BaseMixin):
         model = RateLimit(
             limit=limit_allowed, used=limit_used, reset=limit_reset
         )
-        return model.dict()
+        return model if self._output_models else model.dict()

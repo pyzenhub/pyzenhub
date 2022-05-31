@@ -77,6 +77,12 @@ def test_get_release_reports(zh):
         assert list(item.keys()) == RELEASE_REPORT_KEYS_NO_REPO
 
 
+def test_get_release_reports_models(zh):
+    zh._output_models = True
+    data = zh.get_release_reports(REPO_ID)
+    assert len(data) >= 4
+
+
 def test_edit_release_report(zh):
     description = f"New Description {random.randint(0, 1000)}"
     data = zh.edit_release_report(

@@ -11,6 +11,13 @@ def test_get_release_report_issues(zh):
     assert data
 
 
+def test_get_release_report_issues_models(zh):
+    zh._output_models = True
+    data = zh.get_release_report_issues(RELEASE_REPORT)
+    assert isinstance(data, list)
+    assert data
+
+
 def test_get_release_report_issues_invalid(zh):
     with pytest.raises(ZenhubError) as excinfo:
         zh.get_release_report_issues("invalid-id")

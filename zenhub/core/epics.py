@@ -1,12 +1,12 @@
 """ZenHub epics methods."""
-from typing import Iterable
+from typing import Iterable, Union
 
 from ..models import AddRemoveIssuesEpic, EpicData, Epics, Issue
 from .base import BaseMixin
 
 
 class EpicsMixin(BaseMixin):
-    def get_epics(self, repo_id: int) -> dict:
+    def get_epics(self, repo_id: int) -> Union[Epics, dict]:
         """
         Get all Epics for a repository.
 
@@ -17,7 +17,7 @@ class EpicsMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        Epics or dict
             See example response below.
 
         .. code-block:: python
@@ -50,9 +50,14 @@ class EpicsMixin(BaseMixin):
         # GET /p1/repositories/:repo_id/epics
         url = f"/p1/repositories/{repo_id}/epics"
         data = self._get(url)
-        return Epics.parse_obj(data).dict(include=data.keys())
+        model = Epics.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )
 
-    def get_epic_data(self, repo_id: int, epic_id: int) -> dict:
+    def get_epic_data(
+        self, repo_id: int, epic_id: int
+    ) -> Union[EpicData, dict]:
         """
         Get all Epics for a repository.
 
@@ -65,7 +70,7 @@ class EpicsMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        EpicData or dict
             See example response below.
 
         .. code-block:: python
@@ -147,7 +152,10 @@ class EpicsMixin(BaseMixin):
         # GET /p1/repositories/:repo_id/epics/:epic_id
         url = f"/p1/repositories/{repo_id}/epics/{epic_id}"
         data = self._get(url)
-        return EpicData.parse_obj(data).dict(include=data.keys())
+        model = EpicData.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )
 
     def convert_epic_to_issue(self, repo_id: int, issue_number: int) -> bool:
         """
@@ -217,7 +225,7 @@ class EpicsMixin(BaseMixin):
         issue_number: int,
         remove_issues: Iterable[Issue] = (),
         add_issues: Iterable[Issue] = (),
-    ) -> dict:
+    ) -> Union[AddRemoveIssuesEpic, dict]:
         """
         Bulk add or remove issues to an Epic.
 
@@ -236,7 +244,7 @@ class EpicsMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        AddRemoveIssuesEpic or dict
             Example response.
 
         .. code-block:: python
@@ -262,4 +270,7 @@ class EpicsMixin(BaseMixin):
             "add_issues": list(add_issues),
         }
         data = self._post(url, body=body)
-        return AddRemoveIssuesEpic.parse_obj(data).dict(include=data.keys())
+        model = AddRemoveIssuesEpic.parse_obj(data)
+        return (
+            model if self._output_models else model.dict(include=data.keys())
+        )

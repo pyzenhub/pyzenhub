@@ -1,4 +1,6 @@
 """Test ZenHub issues API."""
+import time
+
 import pytest
 
 from zenhub import Zenhub
@@ -10,4 +12,5 @@ from .data import TOKEN
 # ----------------------------------------------------------------------------
 @pytest.fixture
 def zh():
-    return Zenhub(TOKEN)
+    yield Zenhub(TOKEN)
+    time.sleep(0.25)

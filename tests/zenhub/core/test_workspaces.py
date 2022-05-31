@@ -6,6 +6,12 @@ def test_get_workspaces(zh):
     assert data
 
 
+def test_get_workspaces_model(zh):
+    zh._output_models = True
+    data = zh.get_workspaces(REPO_ID)
+    assert data
+
+
 def test_get_repository_board(zh):
     data = zh.get_repository_board(WORKSPACE_ID, REPO_ID)
     assert data
