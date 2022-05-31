@@ -36,7 +36,7 @@ class EstimateIssueEvent(Event):
 class TransferIssueEvent(Event):
     from_pipeline: Optional[PipelineName]
     to_pipeline: Optional[PipelineName]
-    Workspace_id: Optional[Base64String]
+    workspace_id: Optional[Base64String]
 
 
 class PlusOnes(BaseModel):
