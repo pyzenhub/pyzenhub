@@ -2,7 +2,7 @@
 from typing import Union
 
 from ..models import Dependencies, Dependency
-from .base import BaseMixin
+from ._base import BaseMixin
 
 
 class DependenciesMixin(BaseMixin):
@@ -17,38 +17,39 @@ class DependenciesMixin(BaseMixin):
 
         Returns
         -------
-        Dependencies or dict
-            Dictionary of dependencies. See example below.
+        :class:`zenhub.models.Dependencies` or :class:`dict`
+            Dictionary of dependencies. See example dictionary below.
 
-        .. code-block:: python
-            {
-                "dependencies": [
-                    {
-                        "blocking": {
-                            "issue_number": 3953,
-                            "repo_id": 1234567
+            .. code-block:: python
+
+                {
+                    "dependencies": [
+                        {
+                            "blocking": {
+                                "issue_number": 3953,
+                                "repo_id": 1234567
+                            },
+                            "blocked": {
+                                "issue_number": 1342,
+                                "repo_id": 1234567
+                            }
                         },
-                        "blocked": {
-                            "issue_number": 1342,
-                            "repo_id": 1234567
+                        {
+                            "blocking": {
+                                "issue_number": 5,
+                                "repo_id": 987
+                            },
+                            "blocked": {
+                                "issue_number": 1342,
+                                "repo_id": 1234567
+                            }
                         }
-                    },
-                    {
-                        "blocking": {
-                            "issue_number": 5,
-                            "repo_id": 987
-                        },
-                        "blocked": {
-                            "issue_number": 1342,
-                            "repo_id": 1234567
-                        }
-                    }
-                ]
-            }
+                    ]
+                }
 
         Note
         ----
-        https://github.com/ZenHubIO/API#get-dependencies-for-a-repository
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#get-dependencies-for-a-repository>`_.
         """
         self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/dependencies
@@ -82,24 +83,25 @@ class DependenciesMixin(BaseMixin):
 
         Returns
         -------
-        Dependency or dict
-            Example response.
+        :class:`zenhub.models.Dependency` or :class:`dict`
+            Example ditionary below.
 
-        .. code-block:: python
-            {
-                "blocking": {
-                    "repo_id": 92563409,
-                    "issue_number": 14
-                },
-                "blocked": {
-                    "repo_id": 92563409,
-                    "issue_number": 13
+            .. code-block:: python
+
+                {
+                    "blocking": {
+                        "repo_id": 92563409,
+                        "issue_number": 14
+                    },
+                    "blocked": {
+                        "repo_id": 92563409,
+                        "issue_number": 13
+                    }
                 }
-            }
 
         Note
         ----
-        https://github.com/ZenHubIO/API#create-a-dependency
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#create-a-dependency>`_.
         """
         self._repo_id = blocked_repo_id
         # POST /p1/dependencies
@@ -143,12 +145,12 @@ class DependenciesMixin(BaseMixin):
 
         Returns
         -------
-        bool
+        :class:`bool`
             ``True`` if the dependency was removed.
 
         Note
         ----
-        https://github.com/ZenHubIO/API#remove-a-dependency
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#remove-a-dependency>`_.
         """
         self._repo_id = blocked_repo_id
         # DELETE /p1/dependencies

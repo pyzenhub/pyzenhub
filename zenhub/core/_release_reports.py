@@ -2,10 +2,10 @@
 import datetime
 from typing import Iterable, List, Optional, Union
 
+from .._types import Base64String, ReportState
 from ..models import ReleaseReport
-from ..types import Base64String, ReportState
 from ..utils import check_dates, date_to_string
-from .base import BaseMixin
+from ._base import BaseMixin
 
 
 class ReleaseReportsMixin(BaseMixin):
@@ -32,32 +32,45 @@ class ReleaseReportsMixin(BaseMixin):
         desired_end_date : datetime.datetime
             End date of the Release Report.
         description : str, optional
-            Start date of the Release Report. The default is ''.
+            Start date of the Release Report. The default is ``""``.
         repositories : Iterable of int, optional
             List of repository IDs to include in the Release Report.
-            The default is ().
+            The default is ``()``.
 
         Returns
         -------
-        ReleaseReport or dict
+        :class:`zenhub.models.ReleaseReport` or ``dict``
             The created Release Report. See example response below.
 
-        .. code-block:: python
-            {
-                "release_id": "59dff4f508399a35a276a1ea",
-                "title": "Great title",
-                "description": "Amazing description",
-                "start_date": "2007-01-01T00:00:00.000Z",
-                "desired_end_date": "2007-01-01T00:00:00.000Z",
-                "created_at": "2017-10-12T23:04:21.795Z",
-                "closed_at": None,
-                "state": "open",
-                "repositories": [103707262]
-            }
+            .. code-block:: python
+
+                {
+                    "release_id": "59dff4f508399a35a276a1ea",
+                    "title": "Great title",
+                    "description": "Amazing description",
+                    "start_date":
+                        datetime.datetime(
+                            2007, 1, 1
+                            tzinfo=datetime.timezone.utc
+                        ),
+                    "desired_end_date":
+                        datetime.datetime(
+                            2007, 1, 1
+                            tzinfo=datetime.timezone.utc
+                        ),
+                    "created_at": "2017-10-12T23:04:21.795Z",
+                        datetime.datetime(
+                            2017, 10, 12, 23, 04, 21, 795000
+                            tzinfo=datetime.timezone.utc
+                        ),
+                    "closed_at": None,
+                    "state": "open",
+                    "repositories": [103707262]
+                }
 
         Note
         ----
-        https://github.com/ZenHubIO/API#create-a-release-report
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#create-a-release-report>`_.
         """
         self._repo_id = repo_id
         check_dates(start_date, desired_end_date)
@@ -93,24 +106,38 @@ class ReleaseReportsMixin(BaseMixin):
 
         Returns
         -------
-        ReleaseReport or dict
+        :class:`zenhub.models.ReleaseReport` or :clas:`dict`
             The requested Release Report. See example response below.
 
-        .. code-block:: python
-            {
-                "release_id": "59d3cd520a430a6344fd3bdb",
-                "title": "Test release",
-                "description": "",
-                "start_date": "2017-10-01T19:00:00.000Z",
-                "desired_end_date": "2017-10-03T19:00:00.000Z",
-                "created_at": "2017-10-03T17:48:02.701Z",
-                "closed_at": None,
-                "state": "open",
-                "repositories": [105683718]
-            }
+            .. code-block:: python
+
+                {
+                    "release_id": "59d3cd520a430a6344fd3bdb",
+                    "title": "Test release",
+                    "description": "",
+                    "start_date":
+                        datetime.datetime(
+                            2017, 10, 1, 19
+                            tzinfo=datetime.timezone.utc
+                        ),
+                    "desired_end_date":
+                        datetime.datetime(
+                            2017, 10, 3, 19
+                            tzinfo=datetime.timezone.utc
+                        ),
+                    "created_at":
+                        datetime.datetime(
+                            2017, 10, 3, 17, 48, 02, 701000
+                            tzinfo=datetime.timezone.utc
+                        ),
+                    "closed_at": None,
+                    "state": "open",
+                    "repositories": [105683718]
+                }
+
         Note
         ----
-        https://github.com/ZenHubIO/API#get-a-release-report
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#get-a-release-report>`_.
         """
         # GET /p1/reports/release/:release_id
         url = f"/p1/reports/release/{release_id}"
@@ -133,35 +160,61 @@ class ReleaseReportsMixin(BaseMixin):
 
         Returns
         -------
-        List of ReleaseReport or List of dict. See example response below.
+        :class:`list` of :class:`zenhub.models.ReleaseReport` or :class:`list` of :class:`dict`
+            See example response below.
 
-        .. code-block:: python
-            [
-                {
-                    "release_id": "59cbf2fde010f7a5207406e8",
-                    "title": "Great title for release 1",
-                    "description": "Great description for release",
-                    "start_date": "2000-10-10T00:00:00.000Z",
-                    "desired_end_date": "2010-10-10T00:00:00.000Z",
-                    "created_at": "2017-09-27T18:50:37.418Z",
-                    "closed_at": None,
-                    "state": "open"
-                },
-                {
-                    "release_id": "59cbf2fde010f7a5207406e8",
-                    "title": "Great title for release 2",
-                    "description": "Great description for release",
-                    "start_date": "2000-10-10T00:00:00.000Z",
-                    "desired_end_date": "2010-10-10T00:00:00.000Z",
-                    "created_at": "2017-09-27T18:50:37.418Z",
-                    "closed_at": None,
-                    "state": "open"
-                }
-            ]
+            .. code-block:: python
+
+                [
+                    {
+                        "release_id": "59cbf2fde010f7a5207406e8",
+                        "title": "Great title for release 1",
+                        "description": "Great description for release",
+                        "start_date":
+                            datetime.datetime(
+                                2000, 10, 10
+                                tzinfo=datetime.timezone.utc
+                            ),
+                        "desired_end_date":
+                            datetime.datetime(
+                                2010, 10, 10
+                                tzinfo=datetime.timezone.utc
+                            ),
+                        "created_at":
+                            datetime.datetime(
+                                2017, 9, 27, 18, 50, 37, 418000
+                                tzinfo=datetime.timezone.utc
+                            ),
+                        "closed_at": None,
+                        "state": "open"
+                    },
+                    {
+                        "release_id": "59cbf2fde010f7a5207406e8",
+                        "title": "Great title for release 2",
+                        "description": "Great description for release",
+                        "start_date":
+                            datetime.datetime(
+                                2000, 10, 10
+                                tzinfo=datetime.timezone.utc
+                            ),
+                        "desired_end_date":
+                            datetime.datetime(
+                                2010, 10, 10
+                                tzinfo=datetime.timezone.utc
+                            ),
+                        "created_at":
+                            datetime.datetime(
+                                2017, 9, 27, 18, 50, 37, 418000
+                                tzinfo=datetime.timezone.utc
+                            ),
+                        "closed_at": None,
+                        "state": "open"
+                    }
+                ]
 
         Note
         ----
-        https://github.com/ZenHubIO/API#get-release-reports-for-a-repository
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#get-release-reports-for-a-repository>`_.
         """
         self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/reports/releases
@@ -203,25 +256,42 @@ class ReleaseReportsMixin(BaseMixin):
 
         Returns
         -------
-        ReleaseReport or dict
+        :class:`zenhub.models.ReleaseReport` or :class:`dict`
             The created Release Report. See example response below.
 
-        .. code-block:: python
-            {
-                "release_id": "59d3d6438b3f16667f9e7174",
-                "title": "Amazing title",
-                "description": "Amazing description",
-                "start_date": "2007-01-01T00:00:00.000Z",
-                "desired_end_date": "2007-01-01T00:00:00.000Z",
-                "created_at": "2017-10-03T18:26:11.700Z",
-                "closed_at": "2017-10-03T18:26:11.700Z",
-                "state": "closed",
-                "repositories": [105683567, 105683718]
-            }
+            .. code-block:: python
+
+                {
+                    "release_id": "59d3d6438b3f16667f9e7174",
+                    "title": "Amazing title",
+                    "description": "Amazing description",
+                    "start_date":
+                        datetime.datetime(
+                            2007, 1, 1
+                            tzinfo=datetime.timezone.utc
+                        ),
+                    "desired_end_date":
+                        datetime.datetime(
+                            2007, 1, 1
+                            tzinfo=datetime.timezone.utc
+                        ),
+                    "created_at":
+                        datetime.datetime(
+                            2017, 10, 3, 18, 26, 11, 701000
+                            tzinfo=datetime.timezone.utc
+                        ),
+                    "closed_at":
+                        datetime.datetime(
+                            2017, 10, 3, 18, 26, 11, 700000
+                            tzinfo=datetime.timezone.utc
+                        ),
+                    "state": "closed",
+                    "repositories": [105683567, 105683718]
+                }
 
         Note
         ----
-        https://github.com/ZenHubIO/API#edit-a-release-report
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#edit-a-release-report>`_.
         """
         check_dates(start_date, desired_end_date)
         # PATCH /p1/reports/release/:release_id
@@ -259,12 +329,12 @@ class ReleaseReportsMixin(BaseMixin):
 
         Returns
         -------
-        bool
+        :class:`bool`
             ``True`` if successful.
 
         Note
         ----
-        https://github.com/ZenHubIO/API#add-a-repository-to-a-release-report
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#add-a-repository-to-a-release-report>`_.
         """
         self._repo_id = repo_id
         # POST /p1/reports/release/:release_id/repository/:repo_id
@@ -286,13 +356,14 @@ class ReleaseReportsMixin(BaseMixin):
 
         Returns
         -------
-        bool
+        :class:`bool`
             ``True`` if successful.
 
         Note
         ----
         A release must always have at least one repository.
-        https://github.com/ZenHubIO/API#remove-a-repository-from-a-release-report
+
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#remove-a-repository-from-a-release-report>`_.
         """
         self._repo_id = repo_id
         # DELETE /p1/reports/release/:release_id/repository/:repo_id

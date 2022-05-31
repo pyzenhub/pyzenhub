@@ -2,6 +2,8 @@
 from typing_extensions import Literal
 
 URLString = str
+"""URL string."""
+
 Base64String = str
 ReportState = Literal["open", "closed"]
 IssuePosition = Literal["top", "bottom"]

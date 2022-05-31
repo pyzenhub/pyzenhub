@@ -2,9 +2,9 @@
 
 from typing import Iterable, List, Union
 
+from .._types import Base64String
 from ..models import AddRemoveIssue, Issue
-from ..types import Base64String
-from .base import BaseMixin
+from ._base import BaseMixin
 
 
 class ReleaseReportIssuesMixin(BaseMixin):
@@ -21,18 +21,19 @@ class ReleaseReportIssuesMixin(BaseMixin):
 
         Returns
         -------
-        List of Issue or List of dictionaries
+        :class:`list` of :class:`zenhub.models.Issue` or :class:`list` of :class:`dict`
             See example response below.
 
-        .. code-block:: python
-            [
-                { "repo_id": 103707262, "issue_number": 2 },
-                { "repo_id": 103707262, "issue_number": 3 },
-            ]
+            .. code-block:: python
+
+                [
+                    { "repo_id": 103707262, "issue_number": 2 },
+                    { "repo_id": 103707262, "issue_number": 3 },
+                ]
 
         Note
         ----
-        https://github.com/ZenHubIO/API#get-all-the-issues-for-a-release-report
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#get-all-the-issues-for-a-release-report>`_.
         """
         # GET /p1/reports/release/:release_id/issues
         url = f"/p1/reports/release/{release_id}/issues"
@@ -69,18 +70,19 @@ class ReleaseReportIssuesMixin(BaseMixin):
 
         Returns
         -------
-        AddRemoveIssue or dict
+        :class:`zenhub.models.AddRemoveIssue` or :class:`dict`
             The added or removed issues. See example response below.
 
-        .. code-block:: python
-            {
-                "added": [{ "repo_id": 103707262, "issue_number": 3 }],
-                "removed": [],
-            }
+            .. code-block:: python
+
+                {
+                    "added": [{ "repo_id": 103707262, "issue_number": 3 }],
+                    "removed": [],
+                }
 
         Note
         ----
-        https://github.com/ZenHubIO/API#add-or-remove-issues-to-or-from-a-release-report
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#add-or-remove-issues-to-or-from-a-release-report>`_.
         """
         # PATCH /p1/reports/release/:release_id/issues
         url = f"/p1/reports/release/{release_id}/issues"

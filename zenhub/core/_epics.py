@@ -2,7 +2,7 @@
 from typing import Iterable, Union
 
 from ..models import AddRemoveIssuesEpic, EpicData, Epics, Issue
-from .base import BaseMixin
+from ._base import BaseMixin
 
 
 class EpicsMixin(BaseMixin):
@@ -17,34 +17,37 @@ class EpicsMixin(BaseMixin):
 
         Returns
         -------
-        Epics or dict
-            See example response below.
+        :class:`zenhub.models.Epics` or :class:`dict`
+            See example dictionary below.
 
-        .. code-block:: python
-            {
-                "epic_issues": [
+            .. code-block:: python
+
+                {
+                  "epic_issues": [
                     {
-                        "issue_number": 3953,
-                        "repo_id": 1234567,
-                        "issue_url": "https://github.com/RepoOwner/RepoName/issues/3953"
+                      "issue_number": 3953,
+                      "repo_id": 1234567,
+                      "issue_url":
+                        "https://github.com/RepoOwner/RepoName/issues/3953"
                     },
                     {
-                        "issue_number": 1342,
-                        "repo_id": 1234567,
-                        "issue_url": "https://github.com/RepoOwner/RepoName/issues/1342"
+                      "issue_number": 1342,
+                      "repo_id": 1234567,
+                      "issue_url":
+                        "https://github.com/RepoOwner/RepoName/issues/1342"
                     }
-                ]
-            }
+                  ]
+                }
 
         Note
         ----
-        - The endpoint returns an array of the repository’s Epics. The issue
+        - The endpoint returns a list of the repository’s Epics. The issue
           number, repository ID, and GitHub issue URL is provided for each
           Epic.
         - If an issue is only an issue belonging to an Epic (and not a parent
-          Epic), it is not considered an Epic and won’t be included in the return
-          array.
-        https://github.com/ZenHubIO/API#get-epics-for-a-repository
+          Epic), it is not considered an Epic and won’t be included in the list.
+
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#get-epics-for-a-repository>`_.
         """
         self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/epics
@@ -70,83 +73,84 @@ class EpicsMixin(BaseMixin):
 
         Returns
         -------
-        EpicData or dict
-            See example response below.
+        :class:`zenhub.models.EpicData` or :class:`dict`
+            See example dictionary below.
 
-        .. code-block:: python
-            {
-                "total_epic_estimates": {"value": 60},
-                "estimate": {"value": 10},
-                "pipeline": {
-                    "workspace_id": "5d0a7a9741fd098f6b7f58ac",
-                    "name": "Backlog",
-                    "pipeline_id": "5d0a7a9741fd098f6b7f58a8"
-                },
-                "pipelines": [
-                    {
+            .. code-block:: python
+
+                {
+                    "total_epic_estimates": {"value": 60},
+                    "estimate": {"value": 10},
+                    "pipeline": {
                         "workspace_id": "5d0a7a9741fd098f6b7f58ac",
                         "name": "Backlog",
                         "pipeline_id": "5d0a7a9741fd098f6b7f58a8"
                     },
-                    {
-                        "workspace_id": "5d0a7cea41fd098f6b7f58b8",
-                        "name": "In Progress",
-                        "pipeline_id": "5d0a7cea41fd098f6b7f58b5"
-                    }
-                ],
-                "issues": [
-                    {
-                        "issue_number": 3161,
-                        "is_epic": True,
-                        "repo_id": 1099029,
-                        "estimate": {"value": 40},
-                        "pipelines": [
-                            {
-                                "workspace_id": "5d0a7a9741fd098f6b7f58ac",
-                                "name": "Backlog",
-                                "pipeline_id": "5d0a7a9741fd098f6b7f58a8"
-                            },
-                            {
-                                "workspace_id": "5d0a7cea41fd098f6b7f58b8",
-                                "name": "In Progress",
-                                "pipeline_id": "5d0a7cea41fd098f6b7f58b5"
-                            }
-                        ],
-                        "pipeline": {
+                    "pipelines": [
+                        {
                             "workspace_id": "5d0a7a9741fd098f6b7f58ac",
                             "name": "Backlog",
                             "pipeline_id": "5d0a7a9741fd098f6b7f58a8"
+                        },
+                        {
+                            "workspace_id": "5d0a7cea41fd098f6b7f58b8",
+                            "name": "In Progress",
+                            "pipeline_id": "5d0a7cea41fd098f6b7f58b5"
                         }
-                    },
-                    {
-                        "issue_number": 2,
-                        "is_epic": False,
-                        "repo_id": 1234567,
-                        "estimate": {"value": 10},
-                        "pipelines": [
-                            {
+                    ],
+                    "issues": [
+                        {
+                            "issue_number": 3161,
+                            "is_epic": True,
+                            "repo_id": 1099029,
+                            "estimate": {"value": 40},
+                            "pipelines": [
+                                {
+                                    "workspace_id": "5d0a7a9741fd098f6b7f58ac",
+                                    "name": "Backlog",
+                                    "pipeline_id": "5d0a7a9741fd098f6b7f58a8"
+                                },
+                                {
+                                    "workspace_id": "5d0a7cea41fd098f6b7f58b8",
+                                    "name": "In Progress",
+                                    "pipeline_id": "5d0a7cea41fd098f6b7f58b5"
+                                }
+                            ],
+                            "pipeline": {
                                 "workspace_id": "5d0a7a9741fd098f6b7f58ac",
                                 "name": "Backlog",
                                 "pipeline_id": "5d0a7a9741fd098f6b7f58a8"
-                            },
-                            {
-                                "workspace_id": "5d0a7cea41fd098f6b7f58b8",
-                                "name": "In Progress",
-                                "pipeline_id": "5d0a7cea41fd098f6b7f58b5"
                             }
-                        ],
-                        "pipeline": {
-                            "workspace_id": "5d0a7a9741fd098f6b7f58ac",
-                            "name": "Backlog",
-                            "pipeline_id": "5d0a7a9741fd098f6b7f58a8"
+                        },
+                        {
+                            "issue_number": 2,
+                            "is_epic": False,
+                            "repo_id": 1234567,
+                            "estimate": {"value": 10},
+                            "pipelines": [
+                                {
+                                    "workspace_id": "5d0a7a9741fd098f6b7f58ac",
+                                    "name": "Backlog",
+                                    "pipeline_id": "5d0a7a9741fd098f6b7f58a8"
+                                },
+                                {
+                                    "workspace_id": "5d0a7cea41fd098f6b7f58b8",
+                                    "name": "In Progress",
+                                    "pipeline_id": "5d0a7cea41fd098f6b7f58b5"
+                                }
+                            ],
+                            "pipeline": {
+                                "workspace_id": "5d0a7a9741fd098f6b7f58ac",
+                                "name": "Backlog",
+                                "pipeline_id": "5d0a7a9741fd098f6b7f58a8"
+                            }
                         }
-                    }
-                ]
-            }
+                    ]
+                }
 
         Note
         ----
-        https://github.com/ZenHubIO/API#get-epic-data
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#get-epic-data>`_.
         """
         self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/epics/:epic_id
@@ -170,12 +174,12 @@ class EpicsMixin(BaseMixin):
 
         Returns
         -------
-        bool
+        :class:`bool`
             ``True`` if successful.
 
         Note
         ----
-        https://github.com/ZenHubIO/API#convert-an-epic-to-an-issue
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#convert-an-epic-to-an-issue>`_.
         """
         self._repo_id = repo_id
         # POST /p1/repositories/:repo_id/epics/:issue_number/convert_to_issue
@@ -203,12 +207,12 @@ class EpicsMixin(BaseMixin):
 
         Returns
         -------
-        bool
+        :class:`bool`
             ``True`` if successful.
 
         Note
         ----
-        https://github.com/ZenHubIO/API#convert-issue-to-epic
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#convert-issue-to-epic>`_.
         """
         self._repo_id = repo_id
         # POST /p1/repositories/:repo_id/issues/:issue_number/convert_to_epic
@@ -244,23 +248,24 @@ class EpicsMixin(BaseMixin):
 
         Returns
         -------
-        AddRemoveIssuesEpic or dict
-            Example response.
+        :class:`zenhub.models.AddRemoveIssuesEpic` or :class:`dict`
+            See example dictionary below.
 
-        .. code-block:: python
-            {
-                "removed_issues": [
-                    {"repo_id": 3887883, "issue_number": 3}
-                ],
-                "added_issues": [
-                    {"repo_id": 3887883, "issue_number": 2},
-                    {"repo_id": 3887883, "issue_number": 1}
-                ]
-            }
+            .. code-block:: python
+
+                {
+                    "removed_issues": [
+                        {"repo_id": 3887883, "issue_number": 3}
+                    ],
+                    "added_issues": [
+                        {"repo_id": 3887883, "issue_number": 2},
+                        {"repo_id": 3887883, "issue_number": 1}
+                    ]
+                }
 
         Note
         ----
-        https://github.com/ZenHubIO/API#add-or-remove-issues-to-epic
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#add-or-remove-issues-to-epic>`_.
         """
         self._repo_id = repo_id
         # POST /p1/repositories/:repo_id/epics/:issue_number/update_issues

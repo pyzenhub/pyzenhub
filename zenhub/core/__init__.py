@@ -3,15 +3,15 @@ from typing import Optional
 
 import requests
 
-from ..types import URLString
-from .dependencies import DependenciesMixin
-from .epics import EpicsMixin
-from .issues import IssuesMixin
-from .milestones import MilestonesMixin
-from .rate import RateMixin
-from .release_report_issues import ReleaseReportIssuesMixin
-from .release_reports import ReleaseReportsMixin
-from .workspaces import WorkspacesMixin
+from .._types import URLString
+from ._dependencies import DependenciesMixin
+from ._epics import EpicsMixin
+from ._issues import IssuesMixin
+from ._milestones import MilestonesMixin
+from ._rate import RateMixin
+from ._release_report_issues import ReleaseReportIssuesMixin
+from ._release_reports import ReleaseReportsMixin
+from ._workspaces import WorkspacesMixin
 
 # Constants
 DEFAULT_BASE_URL: URLString = "https://api.zenhub.com"
@@ -27,7 +27,23 @@ class Zenhub(
     ReleaseReportIssuesMixin,
     RateMixin,
 ):
-    """Zenhub API wrapper."""
+    """ZenHub API wrapper.
+
+    Parameters
+    ----------
+    token : str
+        ZenHub API token.
+    base_url : URLString, optional
+        Default is ``'https://api.zenhub.com'``.
+    enterprise : int, optional
+        Default is ``2``.
+    return_models : bool, optional
+        Default is ``False``.
+
+    Note
+    ----
+    For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API>`_.
+    """
 
     _HEADERS = {
         "Content-Type": "application/json",

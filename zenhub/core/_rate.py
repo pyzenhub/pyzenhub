@@ -6,7 +6,7 @@ from requests.structures import CaseInsensitiveDict
 
 from ..exceptions import ZenhubError
 from ..models import RateLimit
-from .base import BaseMixin
+from ._base import BaseMixin
 
 
 class RateMixin(BaseMixin):
@@ -42,20 +42,21 @@ class RateMixin(BaseMixin):
         Parameters
         ----------
         repo_id : int, optional
-            ID of the repository, not its full name. Default is `None`.
+            ID of the repository, not its full name. Default is ``None``.
 
         Returns
         -------
-        dict or RateLimit
+        :class:`zenhub.models.RateLimit` or :class:`dict`
             Dictionary with rate limit, available calls and time to reset
-            limits in seconds.
+            limits in seconds. See example response below.
 
-        .. code-block:: python
-            {'used': 3, 'limit': 100, 'reset': 58}
+            .. code-block:: python
+
+                {'used': 3, 'limit': 100, 'reset': 58}
 
         Note
         ----
-        https://github.com/ZenHubIO/API#api-rate-limit
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#api-rate-limit>`_.
         """
         headers = self._headers(repo_id)
         limit_used_string = headers.get('X-RateLimit-Used', -1)
