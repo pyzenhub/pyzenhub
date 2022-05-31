@@ -1,7 +1,13 @@
 """ZenHub issues methods."""
-from typing import Union
+from typing import List, Optional, Union
 
-from ..models import Estimate, IssueData
+from ..models import (
+    Estimate,
+    EstimateIssueEvent,
+    Event,
+    IssueData,
+    TransferIssueEvent,
+)
 from ..types import Base64String, IssuePosition
 from .base import BaseMixin
 
@@ -81,7 +87,9 @@ class IssuesMixin(BaseMixin):
             model if self._output_models else model.dict(include=data.keys())
         )
 
-    def get_issue_events(self, repo_id: int, issue_number: int) -> dict:
+    def get_issue_events(
+        self, repo_id: int, issue_number: int
+    ) -> Union[List[Event], List[dict]]:
         """
         Get the events for an issue.
 
@@ -94,7 +102,7 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        dict
+        List of Event or List of dict
             See example response below.
 
         .. code-block:: python
@@ -163,7 +171,19 @@ class IssuesMixin(BaseMixin):
         self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/issues/:issue_number/events
         url = f"/p1/repositories/{repo_id}/issues/{issue_number}/events"
-        return self._get(url)
+        events: List[dict] = self._get(url)  # type: ignore
+        event_models: List[Event] = []
+        for event in events:
+            event_model: Optional[Event] = None
+            if event["type"] == "estimateIssue":
+                event_model = EstimateIssueEvent.parse_obj(event)
+            elif event["type"] == "transferIssue":
+                event_model = TransferIssueEvent.parse_obj(event)
+
+            if event_model:
+                event_models.append(event_model)
+
+        return event_models if self._output_models else events
 
     def move_issue(
         self,
@@ -285,8 +305,3 @@ class IssuesMixin(BaseMixin):
         return (
             model if self._output_models else model.dict(include=data.keys())
         )
-
-
-'''
-{'pipelines': [{'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNTQ', 'name': 'New Issues', 'issues': [{'issue_number': 11, 'position': 0, 'is_epic': False}, {'issue_number': 13, 'position': 1, 'is_epic': True}, {'issue_number': 14, 'position': 2, 'is_epic': True}, {'issue_number': 16, 'position': 3, 'is_epic': False}]}, {'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNTU', 'name': 'Epics', 'issues': []}, {'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNTY', 'name': 'Icebox', 'issues': []}, {'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNTc', 'name': 'Product Backlog', 'issues': []}, {'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNTg', 'name': 'Sprint Backlog', 'issues': []}, {'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNTk', 'name': 'In Progress', 'issues': []}, {'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNjA', 'name': 'Review/QA', 'issues': []}, {'id': 'Z2lkOi8vcmFwdG9yL1BpcGVsaW5lLzI3MTcwNjE', 'name': 'Done', 'issues': []}]}
-'''

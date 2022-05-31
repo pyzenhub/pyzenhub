@@ -1,4 +1,5 @@
 """ZenHub API pydantic models."""
+import datetime
 from typing import List, Optional, Union
 
 from pydantic import BaseModel
@@ -6,10 +7,36 @@ from pydantic import BaseModel
 from .types import (
     Base64String,
     ISO8601DateString,
+    IssueEventType,
     IssuePosition,
     Seconds,
     URLString,
 )
+
+
+class IssueEstimate(BaseModel):
+    value: int
+
+
+class PipelineName(BaseModel):
+    name: str
+
+
+class Event(BaseModel):
+    user_id: int
+    type: IssueEventType
+    created_at: datetime.datetime
+
+
+class EstimateIssueEvent(Event):
+    from_estimate: Optional[IssueEstimate]
+    to_estimate: Optional[IssueEstimate]
+
+
+class TransferIssueEvent(Event):
+    from_pipeline: Optional[PipelineName]
+    to_pipeline: Optional[PipelineName]
+    Workspace_id: Optional[Base64String]
 
 
 class PlusOnes(BaseModel):
@@ -20,10 +47,6 @@ class Pipeline(BaseModel):
     name: str
     pipeline_id: Base64String
     workspace_id: Base64String
-
-
-class IssueEstimate(BaseModel):
-    value: int
 
 
 class IssueData(BaseModel):
