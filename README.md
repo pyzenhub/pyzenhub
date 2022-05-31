@@ -17,15 +17,26 @@ Version](https://img.shields.io/pypi/pyversions/pyzenhub.svg?color=green)](https
 from zenhub import Zenhub
 
 zh = Zenhub('<zenhub_token>')
-zh.get_epics('<repo_id>')
+zh.get_epics('<repo_id>')  # Dictionary
 ```
 
-For enterprise installs:
+Return models instead of dictionaries
 
 ```python
 from zenhub import Zenhub
 
-zh = Zenhub('<zenhub_token>', base_url=<enterprise-api-endpoint>)
+zh = Zenhub('<zenhub_token>', return_models=True)
+zh.get_epics('<repo_id>')  # Pydantic model!
+```
+
+*Methods will always return dates as `datetime.datetime` objects, not strings.*
+
+### For enterprise installs
+
+```python
+from zenhub import Zenhub
+
+zh = Zenhub('<zenhub_token>', base_url='<enterprise-api-endpoint>')
 zh.get_epics('<repo_id>')
 ```
 
