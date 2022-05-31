@@ -56,7 +56,6 @@ class RateMixin(BaseMixin):
         https://github.com/ZenHubIO/API#api-rate-limit
         """
         headers = self._headers(repo_id)
-        print(headers)
         limit_used_string = headers.get('X-RateLimit-Used', -1)
         limit_allowed_string = headers.get('X-RateLimit-Limit', -1)
         limit_reset_time_string = headers.get('X-RateLimit-Reset', -1)
