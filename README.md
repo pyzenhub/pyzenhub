@@ -8,7 +8,8 @@ Python bindings to the Zenhub API.
 [![PyPI](https://img.shields.io/pypi/v/pyzenhub.svg?color=green)](https://pypi.org/project/pyzenhub)
 [![Python
 Version](https://img.shields.io/pypi/pyversions/pyzenhub.svg?color=green)](https://python.org)
-[![PR Test](https://github.com/goanpeca/pyzenhub/actions/workflows/test_pull_request.yml/badge.svg?branch=main)](https://github.com/goanpeca/pyzenhub/actions/workflows/test_pull_request.yml)
+[![Tests](https://github.com/goanpeca/pyzenhub/actions/workflows/test_pull_request.yml/badge.svg?branch=main)](https://github.com/goanpeca/pyzenhub/actions/workflows/test_pull_request.yml)
+[![Typing](https://github.com/goanpeca/pyzenhub/actions/workflows/test_typing.yml/badge.svg)](https://github.com/goanpeca/pyzenhub/actions/workflows/test_typing.yml)
 [![codecov](https://codecov.io/gh/goanpeca/pyzenhub/branch/main/graph/badge.svg?token=dcsjgl1sOi)](https://codecov.io/gh/goanpeca/pyzenhub)
 
 ## Usage
