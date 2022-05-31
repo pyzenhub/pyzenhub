@@ -59,7 +59,7 @@ class RateMixin(BaseMixin):
         print(headers)
         limit_used_string = headers.get('X-RateLimit-Used', -1)
         limit_allowed_string = headers.get('X-RateLimit-Limit', -1)
-        limit_reset_time_string = int(headers.get('X-RateLimit-Reset', -1))
+        limit_reset_time_string = headers.get('X-RateLimit-Reset', -1)
         server_date_string = headers.get('Date', -1)
         try:
             limit_used = int(limit_used_string)
@@ -71,9 +71,14 @@ class RateMixin(BaseMixin):
         except Exception:
             limit_allowed = -1
 
-        if limit_reset_time_string != -1 and server_date_string != -1:
+        try:
+            limit_reset_time = int(limit_reset_time_string)
+        except Exception:
+            limit_reset_time = -1
+
+        if limit_reset_time != -1 or server_date_string != -1:
             date_reset = datetime.datetime.fromtimestamp(
-                limit_reset_time_string, tz=datetime.timezone.utc
+                limit_reset_time, tz=datetime.timezone.utc
             )
             date_format = (
                 '%a, %d %B %Y %H:%M:%S %Z'  # Mon, 30 May 2022 22:43:37 GMT
