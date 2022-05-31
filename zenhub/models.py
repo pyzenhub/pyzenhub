@@ -9,6 +9,7 @@ from .types import (
     ISO8601DateString,
     IssueEventType,
     IssuePosition,
+    ReportState,
     Seconds,
     URLString,
 )
@@ -81,7 +82,7 @@ class ReleaseReport(BaseModel):
     desired_end_date: ISO8601DateString
     created_at: ISO8601DateString
     closed_at: Optional[ISO8601DateString]
-    state: str
+    state: ReportState
     repositories: Optional[List[int]]
 
 
@@ -111,7 +112,7 @@ class Estimate(BaseModel):
 
 class PipelineIssue(BaseModel):
     issue_number: int
-    estimate: Optional[dict]  # FIXME: IssueEstimate
+    estimate: Optional[IssueEstimate]
     position: Union[IssuePosition, int]
     is_epic: bool
 
