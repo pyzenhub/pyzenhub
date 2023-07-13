@@ -20,7 +20,9 @@ jobs:
         with:
           python-version: 3.9
       - name: Install package
-        run: pip install -e .
+        run: |
+          pip install --upgrade pip
+          pip install -e .
       - name: Install dependencies
         run: pip install pre-commit
       - name: Run pre-commit
