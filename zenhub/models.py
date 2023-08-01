@@ -4,7 +4,7 @@ from typing import List, Optional, Union
 
 from pydantic import BaseModel
 
-from .types import (
+from ._types import (
     Base64String,
     ISO8601DateString,
     IssueEventType,
@@ -149,3 +149,7 @@ class RateLimit(BaseModel):
     limit: int
     used: int
     reset: Seconds
+
+
+class Date(BaseModel):
+    date: datetime.datetime

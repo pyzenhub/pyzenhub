@@ -1,6 +1,7 @@
 """ZenHub issues methods."""
 from typing import List, Optional, Union
 
+from .._types import Base64String, IssuePosition
 from ..models import (
     Estimate,
     EstimateIssueEvent,
@@ -8,8 +9,7 @@ from ..models import (
     IssueData,
     TransferIssueEvent,
 )
-from ..types import Base64String, IssuePosition
-from .base import BaseMixin
+from ._base import BaseMixin
 
 
 class IssuesMixin(BaseMixin):
@@ -28,38 +28,43 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        IssueData or dict
-            The issue data dictionary. See example response below.
+        :class:`zenhub.models.IssueData` or :class:`dict`
+            The issue data dictionary or model. See example dictionary below.
 
-        .. code-block:: python
-            {
-                "estimate": {
-                    "value": 8
-                },
-                "plus_ones": [
-                    {
-                        "created_at": "2015-12-11T18:43:22.296Z"
-                    }
-                ],
-                "pipeline": {
-                    "name": "QA",
-                    "pipeline_id": "5d0a7a9741fd098f6b7f58a7",
-                    "workspace_id": "5d0a7a9741fd098f6b7f58ac"
-                },
-                "pipelines": [
-                    {
+            .. code-block:: python
+
+                {
+                    "estimate": {
+                        "value": 8
+                    },
+                    "plus_ones": [
+                        {
+                            "created_at":
+                                datetime.datetime(
+                                   2015, 12, 11, 18, 43, 22, 296000,
+                                   tzinfo=datetime.timezone.utc
+                                )
+                        }
+                    ],
+                    "pipeline": {
                         "name": "QA",
                         "pipeline_id": "5d0a7a9741fd098f6b7f58a7",
                         "workspace_id": "5d0a7a9741fd098f6b7f58ac"
                     },
-                    {
-                        "name": "Done",
-                        "pipeline_id": "5d0a7cea41fd098f6b7f58b7",
-                        "workspace_id": "5d0a7cea41fd098f6b7f58b8"
-                    }
-                ],
-                "is_epic": True
-            }
+                    "pipelines": [
+                        {
+                            "name": "QA",
+                            "pipeline_id": "5d0a7a9741fd098f6b7f58a7",
+                            "workspace_id": "5d0a7a9741fd098f6b7f58ac"
+                        },
+                        {
+                            "name": "Done",
+                            "pipeline_id": "5d0a7cea41fd098f6b7f58b7",
+                            "workspace_id": "5d0a7cea41fd098f6b7f58b8"
+                        }
+                    ],
+                    "is_epic": True
+                }
 
         Note
         ----
@@ -76,7 +81,7 @@ class IssuesMixin(BaseMixin):
         - ``pipelines`` contains all pipelines in all Workspaces this issue
           is in.
 
-        https://github.com/ZenHubIO/API#get-issue-data
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#get-issue-data>`_.
         """
         self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/issues/:issue_number
@@ -102,59 +107,80 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        List of Event or List of dict
-            See example response below.
+        :class:`list` of :class:`zenhub.models.Event` or :class:`list` of :class:`dict`
+            See example dictionary below.
 
-        .. code-block:: python
-            [
-                {
-                    "user_id": 16717,
-                    "type": "estimateIssue",
-                    "created_at": "2015-12-11T19:43:22.296Z",
-                    "from_estimate": {
-                        "value": 8
-                    }
-                },
-                {
-                    "user_id": 16717,
-                    "type": "estimateIssue",
-                    "created_at": "2015-12-11T18:43:22.296Z",
-                    "from_estimate": {
-                        "value": 4
+            .. code-block:: python
+
+                [
+                    {
+                        "user_id": 16717,
+                        "type": "estimateIssue",
+                        "created_at":
+                            datetime.datetime(
+                                2015, 12, 11, 19, 43, 22, 296000,
+                                tzinfo=datetime.timezone.utc
+                            ),
+                        "from_estimate": {
+                            "value": 8
+                        }
                     },
-                    "to_estimate": {
-                        "value": 8
-                    }
-                },
-                {
-                    "user_id": 16717,
-                    "type": "estimateIssue",
-                    "created_at": "2015-12-11T13:43:22.296Z",
-                    "to_estimate": {
-                        "value": 4
-                    }
-                },
-                {
-                    "user_id": 16717,
-                    "type": "transferIssue",
-                    "created_at": "2015-12-11T12:43:22.296Z",
-                    "from_pipeline": {
-                        "name": "Backlog"
+                    {
+                        "user_id": 16717,
+                        "type": "estimateIssue",
+                        "created_at":
+                            datetime.datetime(
+                                2015, 12, 11, 18, 43, 22, 296000,
+                                tzinfo=datetime.timezone.utc
+                            ),
+                        "from_estimate": {
+                            "value": 4
+                        },
+                        "to_estimate": {
+                            "value": 8
+                        }
                     },
-                    "to_pipeline": {
-                        "name": "In progress"
+                    {
+                        "user_id": 16717,
+                        "type": "estimateIssue",
+                        "created_at":
+                            datetime.datetime(
+                                2015, 12, 11, 13, 43, 22, 296000,
+                                tzinfo=datetime.timezone.utc
+                            ),
+                        "to_estimate": {
+                            "value": 4
+                        }
                     },
-                    "workspace_id": "5d0a7a9741fd098f6b7f58ac"
-                },
-                {
-                    "user_id": 16717,
-                    "type": "transferIssue",
-                    "created_at": "2015-12-11T11:43:22.296Z",
-                    "to_pipeline": {
-                        "name": "Backlog"
+                    {
+                        "user_id": 16717,
+                        "type": "transferIssue",
+                        "created_at":
+                            datetime.datetime(
+                                2015, 12, 11, 12, 43, 22, 296000,
+                                tzinfo=datetime.timezone.utc
+                            ),
+                        "from_pipeline": {
+                            "name": "Backlog"
+                        },
+                        "to_pipeline": {
+                            "name": "In progress"
+                        },
+                        "workspace_id": "5d0a7a9741fd098f6b7f58ac"
+                    },
+                    {
+                        "user_id": 16717,
+                        "type": "transferIssue",
+                        "created_at":
+                            datetime.datetime(
+                                2015, 12, 11, 11, 43, 22, 296000,
+                                tzinfo=datetime.timezone.utc
+                            ),
+                        "to_pipeline": {
+                            "name": "Backlog"
+                        }
                     }
-                }
-            ]
+                ]
 
         Note
         ----
@@ -166,7 +192,7 @@ class IssuesMixin(BaseMixin):
         - transferIssue events include a workspace_id indicating in which
           Workspace the transfer occurred.
 
-        https://github.com/ZenHubIO/API#get-issue-events
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#get-issue-events>`_.
         """
         self._repo_id = repo_id
         # GET /p1/repositories/:repo_id/issues/:issue_number/events
@@ -213,12 +239,12 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        bool
+        :class:`bool`
             ``True`` if successful.
 
         Note
         ----
-        https://github.com/ZenHubIO/API#move-an-issue-between-pipelines
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#move-an-issue-between-pipelines>`_.
         """
         self._repo_id = repo_id
         # POST /p2/workspaces/:workspace_id/repositories/:repo_id/issues/:issue_number/moves
@@ -254,12 +280,12 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        bool
+        :class:`bool`
             ``True`` if successful.
 
         Note
         ----
-        https://github.com/ZenHubIO/API#move-an-issue-between-pipelines-in-the-oldest-workspace
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#move-an-issue-between-pipelines-in-the-oldest-workspace>`_.
         """
         self._repo_id = repo_id
         # POST /p1/repositories/:repo_id/issues/:issue_number/moves
@@ -284,17 +310,16 @@ class IssuesMixin(BaseMixin):
 
         Returns
         -------
-        Estimate or dict.
-            See example response below.
+        :class:`zenhub.models.Estimate` or :class:`dict`
+            See example dictionary below.
 
-        .. code-block:: python
-            {
-                "estimate": 15,
-            }
+            .. code-block:: python
+
+                {"estimate": 15}
 
         Note
         ----
-        https://github.com/ZenHubIO/API#set-issue-estimate
+        For more information visit the `ZenHub API Documentation <https://github.com/ZenHubIO/API#set-issue-estimate>`_.
         """
         self._repo_id = repo_id
         # PUT /p1/repositories/:repo_id/issues/:issue_number/estimate

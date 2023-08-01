@@ -4,6 +4,7 @@ Python bindings to the Zenhub API.
 
 ## Project status
 
+[![Documentation Status](https://readthedocs.org/projects/pyzenhub/badge/?version=latest)](https://pyzenhub.readthedocs.io/en/latest/?badge=latest)
 [![License](https://img.shields.io/pypi/l/pyzenhub.svg?color=green)](https://github.com/goanpeca/pyzenhub/raw/main/LICENSE.txt)
 [![PyPI](https://img.shields.io/pypi/v/pyzenhub.svg?color=green)](https://pypi.org/project/pyzenhub)
 [![Python
